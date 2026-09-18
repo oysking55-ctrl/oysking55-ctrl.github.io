@@ -1,5 +1,12 @@
 [
   {
+    "ticker": "035420",
+    "name": "NAVER",
+    "market": "KR",
+    "date": "2026-09-19",
+    "filename": "035420_2026-09-19.html"
+  },
+  {
     "ticker": "357550",
     "name": "석경에이티",
     "market": "KR",
