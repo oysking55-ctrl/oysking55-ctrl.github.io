@@ -1,5 +1,12 @@
 [
   {
+    "ticker": "357550",
+    "name": "석경에이티",
+    "market": "KR",
+    "date": "2026-09-19",
+    "filename": "357550_2026-09-19.html"
+  },
+  {
     "ticker": "006400",
     "name": "삼성SDI",
     "market": "KR",
