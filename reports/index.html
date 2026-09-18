@@ -1,21 +1,182 @@
 <!DOCTYPE html>
-<html lang="ko"><head><meta charset="UTF-8" />
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>종목분석 리포트 아카이브</title>
 <style>
-  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; }
-  li { margin-bottom: 10px; }
-  a { color: #2a78d6; text-decoration: none; }
-  a:hover { text-decoration: underline; }
-</style></head>
+  :root {
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --grid-line:      #e1e0d9;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6;
+    --series-2:       #eb6834;
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --grid-line:      #2c2c2a;
+    --border:         rgba(255,255,255,0.10);
+    --series-1:       #3987e5;
+    --series-2:       #d95926;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --grid-line:      #2c2c2a;
+      --border:         rgba(255,255,255,0.10);
+      --series-1:       #3987e5;
+      --series-2:       #d95926;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page-plane);
+    color: var(--text-primary);
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 32px 20px 64px; }
+  header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  .subtitle { color: var(--text-secondary); font-size: 14px; margin: 0; }
+  button#theme-toggle {
+    background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 12px; font-size: 13px; cursor: pointer;
+  }
+  .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  #search {
+    flex: 1; min-width: 220px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface-1); color: var(--text-primary); font-size: 14px;
+  }
+  #search:focus { outline: 2px solid var(--series-1); outline-offset: -1px; }
+  .count { color: var(--text-muted); font-size: 13px; white-space: nowrap; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    display: block; text-decoration: none; color: inherit;
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 18px; transition: border-color .15s, transform .15s;
+  }
+  .card:hover { border-color: var(--series-1); transform: translateY(-2px); }
+  .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .market-badge {
+    font-size: 11px; font-weight: 700; letter-spacing: .02em; padding: 3px 8px; border-radius: 999px;
+  }
+  .market-kr { background: rgba(42,120,214,0.14); color: var(--series-1); }
+  .market-us { background: rgba(235,104,52,0.14); color: var(--series-2); }
+  .card-date { font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .card-name { font-size: 17px; font-weight: 600; margin-bottom: 2px; }
+  .card-ticker { font-size: 13px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  .empty { color: var(--text-muted); font-size: 14px; padding: 40px 0; text-align: center; }
+  footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--grid-line); font-size: 12px; color: var(--text-muted); }
+</style>
+</head>
 <body>
-<h1>종목분석 리포트 아카이브</h1>
-<ul>
-<li><a href="./035420_2026-09-19.html">NAVER (KR · 035420)</a> <span style="color:#888;font-size:12px">2026-09-19</span></li>
-<li><a href="./357550_2026-09-19.html">석경에이티 (KR · 357550)</a> <span style="color:#888;font-size:12px">2026-09-19</span></li>
-<li><a href="./006400_2026-09-19.html">삼성SDI (KR · 006400)</a> <span style="color:#888;font-size:12px">2026-09-19</span></li>
-<li><a href="./035420_2026-09-19.html">NAVER (KR · 035420)</a> <span style="color:#888;font-size:12px">2026-09-19</span></li>
-<li><a href="./005930_2026-09-19.html">삼성전자 (KR · 005930)</a> <span style="color:#888;font-size:12px">2026-09-19</span></li>
-<li><a href="./005930_2026-09-19.html">삼성전자 (KR · 005930)</a> <span style="color:#888;font-size:12px">2026-09-19</span></li>
-<li><a href="./005930_2026-09-19.html">삼성전자 (KR · 005930)</a> <span style="color:#888;font-size:12px">2026-09-19</span></li>
-</ul>
-</body></html>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>종목분석 리포트 아카이브</h1>
+      <p class="subtitle">지금까지 분석한 종목 리포트 모음</p>
+    </div>
+    <button id="theme-toggle" type="button" onclick="toggleTheme()">라이트/다크 전환</button>
+  </header>
+
+  <div class="toolbar">
+    <input id="search" type="text" placeholder="종목명 또는 티커로 검색..." oninput="filterCards()" />
+    <span class="count" id="count">4개 리포트</span>
+  </div>
+
+  
+  <div class="grid" id="grid">
+    
+    <a class="card" href="./035420_2026-09-19.html" data-search="naver 035420">
+      <div class="card-top">
+        <span class="market-badge market-kr">KR</span>
+        <span class="card-date">2026-09-19</span>
+      </div>
+      <div class="card-name">NAVER</div>
+      <div class="card-ticker">035420</div>
+    </a>
+    
+    <a class="card" href="./357550_2026-09-19.html" data-search="석경에이티 357550">
+      <div class="card-top">
+        <span class="market-badge market-kr">KR</span>
+        <span class="card-date">2026-09-19</span>
+      </div>
+      <div class="card-name">석경에이티</div>
+      <div class="card-ticker">357550</div>
+    </a>
+    
+    <a class="card" href="./006400_2026-09-19.html" data-search="삼성sdi 006400">
+      <div class="card-top">
+        <span class="market-badge market-kr">KR</span>
+        <span class="card-date">2026-09-19</span>
+      </div>
+      <div class="card-name">삼성SDI</div>
+      <div class="card-ticker">006400</div>
+    </a>
+    
+    <a class="card" href="./005930_2026-09-19.html" data-search="삼성전자 005930">
+      <div class="card-top">
+        <span class="market-badge market-kr">KR</span>
+        <span class="card-date">2026-09-19</span>
+      </div>
+      <div class="card-name">삼성전자</div>
+      <div class="card-ticker">005930</div>
+    </a>
+    
+  </div>
+  <p class="empty" id="empty-search" style="display:none">검색 결과가 없습니다.</p>
+  
+
+  <footer>종목분석 Agent 아카이브 · 최근 갱신: 2026-09-19 08:29</footer>
+</div>
+
+<script>
+  (function () {
+    var saved = localStorage.getItem('stockagent-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  })();
+  function toggleTheme() {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('stockagent-theme', next);
+  }
+  function filterCards() {
+    var q = document.getElementById('search').value.trim().toLowerCase();
+    var cards = document.querySelectorAll('.card');
+    var visible = 0;
+    cards.forEach(function (card) {
+      var match = card.getAttribute('data-search').indexOf(q) !== -1;
+      card.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    var emptyEl = document.getElementById('empty-search');
+    if (emptyEl) emptyEl.style.display = visible === 0 ? 'block' : 'none';
+    var countEl = document.getElementById('count');
+    if (countEl) countEl.textContent = visible + '개 리포트' + (q ? ' (검색 중)' : '');
+  }
+</script>
+</body>
+</html>
