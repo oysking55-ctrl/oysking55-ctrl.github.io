@@ -1,5 +1,12 @@
 [
   {
+    "ticker": "PLUG",
+    "name": "PLUG POWER INC",
+    "market": "US",
+    "date": "2026-09-20",
+    "filename": "PLUG_2026-09-20.html"
+  },
+  {
     "ticker": "005930",
     "name": "삼성전자",
     "market": "KR",
