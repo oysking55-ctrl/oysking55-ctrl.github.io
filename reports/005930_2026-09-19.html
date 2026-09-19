@@ -72,10 +72,14 @@
   h1 { font-size: 26px; margin: 0 0 4px; }
   .subtitle { color: var(--text-secondary); font-size: 14px; margin: 0; }
   .meta { color: var(--text-muted); font-size: 13px; margin-top: 6px; }
-  button#theme-toggle {
+  .subtitle-placeholder-unused {}
+  .header-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+  .chip-btn {
     background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--border);
     border-radius: 6px; padding: 6px 12px; font-size: 13px; cursor: pointer;
+    text-decoration: none; display: inline-block; white-space: nowrap;
   }
+  .chip-btn:hover { border-color: var(--series-1); }
   .disclaimer {
     background: var(--surface-1); border: 1px solid var(--border); border-left: 4px solid var(--status-warning);
     border-radius: 6px; padding: 12px 16px; font-size: 13px; color: var(--text-secondary); margin: 16px 0 28px;
@@ -129,7 +133,10 @@
       <p class="subtitle">업종 정보 미확인</p>
       <p class="meta">리포트 생성: 2026-09-19 08:45 · 재무 데이터 기준일: 2026-09-19</p>
     </div>
-    <button id="theme-toggle" type="button" onclick="toggleTheme()">라이트/다크 전환</button>
+    <div class="header-actions">
+      <a class="chip-btn" href="./index.html">전체 리포트 목록</a>
+      <button id="theme-toggle" class="chip-btn" type="button" onclick="toggleTheme()">라이트/다크 전환</button>
+    </div>
   </header>
 
   <div class="disclaimer">
