@@ -1,5 +1,12 @@
 [
   {
+    "ticker": "011790",
+    "name": "SKC",
+    "market": "KR",
+    "date": "2026-09-20",
+    "filename": "011790_2026-09-20.html"
+  },
+  {
     "ticker": "KT",
     "name": "KT CORP",
     "market": "US",
@@ -12,13 +19,6 @@
     "market": "KR",
     "date": "2026-09-20",
     "filename": "017670_2026-09-20.html"
-  },
-  {
-    "ticker": "011790",
-    "name": "SKC",
-    "market": "KR",
-    "date": "2026-09-20",
-    "filename": "011790_2026-09-20.html"
   },
   {
     "ticker": "001500",
