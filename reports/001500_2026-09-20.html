@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>현대차증권(001500) 종목분석 리포트</title>
+<style>
+  :root {
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --grid-line:      #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6;
+    --series-2:       #eb6834;
+    --series-3:       #1baf7a;
+    --series-4:       #eda100;
+    --status-good:    #0ca30c;
+    --status-warning: #fab219;
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --grid-line:      #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --series-1:       #3987e5;
+    --series-2:       #d95926;
+    --series-3:       #199e70;
+    --series-4:       #c98500;
+    --status-good:    #0ca30c;
+    --status-warning: #fab219;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --grid-line:      #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --series-1:       #3987e5;
+      --series-2:       #d95926;
+      --series-3:       #199e70;
+      --series-4:       #c98500;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page-plane);
+    color: var(--text-primary);
+    line-height: 1.6;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 24px 20px 64px; }
+  header.report-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 16px; margin-bottom: 8px; flex-wrap: wrap;
+  }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  .subtitle { color: var(--text-secondary); font-size: 14px; margin: 0; }
+  .meta { color: var(--text-muted); font-size: 13px; margin-top: 6px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+  .chip-btn {
+    background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 12px; font-size: 13px; cursor: pointer;
+    text-decoration: none; display: inline-block; white-space: nowrap;
+  }
+  .chip-btn:hover { border-color: var(--series-1); }
+  .disclaimer {
+    background: var(--surface-1); border: 1px solid var(--border); border-left: 4px solid var(--status-warning);
+    border-radius: 6px; padding: 12px 16px; font-size: 13px; color: var(--text-secondary); margin: 16px 0 28px;
+  }
+  section { margin: 32px 0; }
+  h2 {
+    font-size: 18px; border-bottom: 1px solid var(--grid-line); padding-bottom: 8px; margin-bottom: 14px;
+  }
+  .badge {
+    display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+    margin-left: 8px; vertical-align: middle;
+  }
+  .badge.fact { background: rgba(42,120,214,0.14); color: var(--series-1); }
+  .badge.ai { background: rgba(235,104,52,0.14); color: var(--series-2); }
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px;
+  }
+  .card p:first-child { margin-top: 0; }
+  .card p:last-child { margin-bottom: 0; }
+  .card a { color: var(--series-1); }
+  table.fin-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 14px; }
+  table.fin-table th, table.fin-table td {
+    text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--grid-line);
+    font-variant-numeric: tabular-nums;
+  }
+  table.fin-table th:first-child, table.fin-table td:first-child { text-align: left; }
+  table.fin-table th { color: var(--text-secondary); font-weight: 600; font-size: 12px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 10px 0 4px; font-size: 12px; color: var(--text-secondary); }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .fin-chart .grid-line { stroke: var(--grid-line); stroke-width: 1; }
+  .fin-chart .baseline { stroke: var(--baseline); stroke-width: 1; }
+  .fin-chart .axis-label { fill: var(--text-muted); font-size: 10px; }
+  .fin-chart .bar { transition: opacity .15s; }
+  .fin-chart .bar:hover { opacity: 0.75; }
+  .chart-empty { color: var(--text-muted); font-size: 13px; }
+  .kpi-row { display: flex; gap: 24px; margin: 10px 0 4px; flex-wrap: wrap; }
+  .kpi { font-size: 13px; color: var(--text-secondary); }
+  .kpi b { display: block; font-size: 18px; color: var(--text-primary); font-weight: 600; }
+  .note { font-size: 12px; color: var(--text-muted); margin-top: 10px; }
+  ul.source-list { font-size: 13px; color: var(--text-secondary); padding-left: 18px; }
+  ul.source-list a { color: var(--series-1); }
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--grid-line); font-size: 12px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="report-header">
+    <div>
+      <h1>현대차증권 <span class="subtitle">(KR · 001500)</span></h1>
+      <p class="subtitle">업종 정보 미확인</p>
+      <p class="meta">리포트 생성: 2026-09-20 03:17 · 재무 데이터 기준일: 2026-09-20</p>
+    </div>
+    <div class="header-actions">
+      <a class="chip-btn" href="./index.html">전체 리포트 목록</a>
+      <button id="theme-toggle" class="chip-btn" type="button" onclick="toggleTheme()">라이트/다크 전환</button>
+    </div>
+  </header>
+
+  <div class="disclaimer">
+    본 리포트는 AI가 생성한 콘텐츠입니다. <span class="badge fact">공식데이터</span> 배지가 붙은 수치는
+    DART/SEC 공시 원문을 코드로 그대로 파싱한 값이며, <span class="badge ai">AI 해석</span> 배지가 붙은
+    서술은 검색 자료를 근거로 AI가 작성한 해석/전망입니다. 투자 판단과 그 결과에 대한 책임은 전적으로
+    이용자 본인에게 있으며, 본 리포트는 투자 권유가 아닙니다.
+  </div>
+
+  <section>
+    <h2>사업 분야 · 경쟁현황 · 경쟁력 <span class="badge ai">AI 해석</span></h2>
+    <div class="card">
+  <p><strong>1. 주요 사업 부문/제품·서비스 구성</strong></p>
+  <ul>
+    <li>제공된 자료에 따르면, 현대차증권은 전 사업 부문의 수익성 회복과 수익원 다변화를 추진하고 있으며 <a href="http://www.4th.kr/news/articleView.html?idxno=2118320" target="_blank" rel="noopener noreferrer">[출처]</a>, 고액자산가 중심의 자산관리(WM) 사업 <a href="https://view.asiae.co.kr/article/2026091109540549675" target="_blank" rel="noopener noreferrer">[출처]</a> 및 발행어음 사업 <a href="https://view.asiae.co.kr/article/2026091109540549675" target="_blank" rel="noopener noreferrer">[출처]</a> 등을 영위하고 있다. 또한 퇴직연금 시장에서 높은 적립금 규모 및 점유율을 보유하고 있으며 <a href="https://www.thebell.co.kr/free/content/ArticleView.asp?key=202609111331323920103794" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://news.bizwatch.co.kr/article/market/2026/09/11/0001" target="_blank" rel="noopener noreferrer">[출처]</a>, 기업금융(IB) 부문에서는 교보증권 DCM 인력을 영입하는 등 조직 정비를 진행하고 있다 <a href="https://www.sisaon.co.kr/news/articleView.html?idxno=204489" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+  </ul>
+
+  <p><strong>2. 속한 산업 내 경쟁현황(주요 경쟁사, 시장점유율 등)</strong></p>
+  <ul>
+    <li>증권업계 전체 퇴직연금 적립금 규모 측면에서 미래에셋증권 밑에 현대차증권이 위치하고 있으며, 한국증권 등이 언급된다 <a href="https://www.thebell.co.kr/free/content/ArticleView.asp?key=202609111331323920103794" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+    <li>투자설명서 진단에 따르면 과거 주식매매 시장점유율은 약 0.4%로 업계 하위권이며, 2023년 말 기준 MTS 월간활성이용자수도 11만3000명으로 비교그룹(16만명)보다 적은 수준이다 <a href="https://www.kukinews.com/article/view/kuk202609160211" target="_blank" rel="noopener noreferrer">[출처]</a>. 그 외 구체적인 시장점유율 수치는 제공된 자료로는 확인되지 않음 <a href="http://www.4th.kr/news/articleView.html?idxno=2118320" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+  </ul>
+
+  <p><strong>3. 이 회사의 경쟁력(강점)과 약점/리스크 요인</strong></p>
+  <ul>
+    <li><strong>강점:</strong> 퇴직연금 시장에서 높은 점유율을 차지하고 있으며 <a href="https://news.bizwatch.co.kr/article/market/2026/09/11/0001" target="_blank" rel="noopener noreferrer">[출처]</a>, 이를 리서치 콘텐츠와 연계하여 차별화된 정보를 제공하려는 시도를 하고 있다 <a href="https://news.bizwatch.co.kr/article/market/2026/09/11/0001" target="_blank" rel="noopener noreferrer">[출처]</a>. 또한 고액자산가 중심의 견조한 자산관리(WM) 사업 성장세를 보이고 있다 <a href="https://view.asiae.co.kr/article/2026091109540549675" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+    <li><strong>약점 및 리스크 요인:</strong> 주식매매 시장점유율이 약 0.4%로 업계 하위권이고 MTS 월간활성이용자수가 비교그룹에 비해 적은 편이다 <a href="https://www.kukinews.com/article/view/kuk202609160211" target="_blank" rel="noopener noreferrer">[출처]</a>. 또한 전체 영업이익은 2021년 고점 이후 낮아진 수준에 머물러 있으며 <a href="https://www.bloter.net/news/articleView.html?idxno=673866" target="_blank" rel="noopener noreferrer">[출처]</a>, 금융시장 변동성 확대 및 시장금리 상승 등의 영향으로 자산운용 실적이 흔들리는 등 이익 안정성이 다소 취약한 모습을 보인다 <a href="https://www.bloter.net/news/articleView.html?idxno=673866" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://news.tf.co.kr/read/economy/2360609.htm" target="_blank" rel="noopener noreferrer">[출처]</a>. 일평균거래대금 감소와 유가증권 손익 악화 등의 요인으로 실적 조정을 받을 수 있다 <a href="https://view.asiae.co.kr/article/2026091109540549675" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+  </ul>
+</div>
+  </section>
+
+  <section>
+    <h2>최근 3개년 경영현황 <span class="badge fact">공식데이터</span></h2>
+    <div class="card">
+      <div class="kpi-row">
+        <div class="kpi">매출 CAGR<b>미확인</b></div>
+        <div class="kpi">순이익 CAGR<b>3.9%</b></div>
+        
+        <div class="kpi">현재가(비공식 참고)<b>7,890원</b></div>
+        
+      </div>
+      <div class="legend">
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-1)"></span>매출액</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-2)"></span>영업이익</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-3)"></span>순이익</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-4)"></span>EBITDA</span>
+        
+      </div>
+      <svg viewBox="0 0 720 340" width="100%" role="img" aria-label="현대차증권 5개년 재무 추이 차트" class="fin-chart"><line x1="88" y1="304.0" x2="704" y2="304.0" class="grid-line" /><text x="80" y="304.0" class="axis-label" text-anchor="end" dominant-baseline="middle">0원</text><line x1="88" y1="232.0" x2="704" y2="232.0" class="grid-line" /><text x="80" y="232.0" class="axis-label" text-anchor="end" dominant-baseline="middle">4,489.1억원</text><line x1="88" y1="160.0" x2="704" y2="160.0" class="grid-line" /><text x="80" y="160.0" class="axis-label" text-anchor="end" dominant-baseline="middle">8,978.2억원</text><line x1="88" y1="88.0" x2="704" y2="88.0" class="grid-line" /><text x="80" y="88.0" class="axis-label" text-anchor="end" dominant-baseline="middle">1.35조원</text><line x1="88" y1="16.0" x2="704" y2="16.0" class="grid-line" /><text x="80" y="16.0" class="axis-label" text-anchor="end" dominant-baseline="middle">1.80조원</text><line x1="88" y1="304.0" x2="704" y2="304.0" class="baseline" /><path d="M147.66666666666669,304.0 L147.66666666666669,54.232825604483764 Q147.66666666666669,50.232825604483764 151.66666666666669,50.232825604483764 L163.66666666666669,50.232825604483764 Q167.66666666666669,50.232825604483764 167.66666666666669,54.232825604483764 L167.66666666666669,304.0 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2023년 매출액: 1.58조원</title></path><path d="M169.66666666666669,304.0 L169.66666666666669,297.54735943289967 Q169.66666666666669,293.54735943289967 173.66666666666669,293.54735943289967 L185.66666666666669,293.54735943289967 Q189.66666666666669,293.54735943289967 189.66666666666669,297.54735943289967 L189.66666666666669,304.0 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2023년 영업이익: 651.7억원</title></path><path d="M191.66666666666669,304.0 L191.66666666666669,299.4173863950507 Q191.66666666666669,295.4173863950507 195.66666666666669,295.4173863950507 L207.66666666666669,295.4173863950507 Q211.66666666666669,295.4173863950507 211.66666666666669,299.4173863950507 L211.66666666666669,304.0 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2023년 순이익: 535.1억원</title></path><path d="M213.66666666666669,304.0 L213.66666666666669,294.9024567309868 Q213.66666666666669,290.9024567309868 217.66666666666669,290.9024567309868 L229.66666666666669,290.9024567309868 Q233.66666666666669,290.9024567309868 233.66666666666669,294.9024567309868 L233.66666666666669,304.0 Z" fill="var(--series-4)" class="bar" data-series="ebitda"><title>2023년 EBITDA: 816.6억원</title></path><text x="190.7" y="324" class="axis-label" text-anchor="middle">2023</text><path d="M353.00000000000006,304.0 L353.00000000000006,20.0 Q353.00000000000006,16.0 357.00000000000006,16.0 L369.00000000000006,16.0 Q373.00000000000006,16.0 373.00000000000006,20.0 L373.00000000000006,304.0 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2024년 매출액: 1.80조원</title></path><path d="M375.00000000000006,304.0 L375.00000000000006,299.2281585379641 Q375.00000000000006,295.2281585379641 379.00000000000006,295.2281585379641 L391.00000000000006,295.2281585379641 Q395.00000000000006,295.2281585379641 395.00000000000006,299.2281585379641 L395.00000000000006,304.0 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2024년 영업이익: 546.9억원</title></path><path d="M397.00000000000006,304.0 L397.00000000000006,302.2019332458247 Q397.00000000000006,298.2019332458247 401.00000000000006,298.2019332458247 L413.00000000000006,298.2019332458247 Q417.00000000000006,298.2019332458247 417.00000000000006,302.2019332458247 L417.00000000000006,304.0 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2024년 순이익: 361.5억원</title></path><path d="M419.00000000000006,304.0 L419.00000000000006,296.0535766495715 Q419.00000000000006,292.0535766495715 423.00000000000006,292.0535766495715 L435.00000000000006,292.0535766495715 Q439.00000000000006,292.0535766495715 439.00000000000006,296.0535766495715 L439.00000000000006,304.0 Z" fill="var(--series-4)" class="bar" data-series="ebitda"><title>2024년 EBITDA: 744.8억원</title></path><text x="396.0" y="324" class="axis-label" text-anchor="middle">2024</text><path d="M580.3333333333334,304.0 L580.3333333333334,296.4115651694973 Q580.3333333333334,292.4115651694973 584.3333333333334,292.4115651694973 L596.3333333333334,292.4115651694973 Q600.3333333333334,292.4115651694973 600.3333333333334,296.4115651694973 L600.3333333333334,304.0 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2025년 영업이익: 722.5억원</title></path><path d="M602.3333333333334,304.0 L602.3333333333334,298.7399340511118 Q602.3333333333334,294.7399340511118 606.3333333333334,294.7399340511118 L618.3333333333334,294.7399340511118 Q622.3333333333334,294.7399340511118 622.3333333333334,298.7399340511118 L622.3333333333334,304.0 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2025년 순이익: 577.4억원</title></path><path d="M624.3333333333334,304.0 L624.3333333333334,292.48523946708485 Q624.3333333333334,288.48523946708485 628.3333333333334,288.48523946708485 L640.3333333333334,288.48523946708485 Q644.3333333333334,288.48523946708485 644.3333333333334,292.48523946708485 L644.3333333333334,304.0 Z" fill="var(--series-4)" class="bar" data-series="ebitda"><title>2025년 EBITDA: 967.3억원</title></path><text x="601.3" y="324" class="axis-label" text-anchor="middle">2025</text></svg>
+      <table class="fin-table">
+        <thead>
+          <tr>
+            <th>연도</th><th>매출액</th><th>YoY</th><th>영업이익</th><th>영업이익률</th>
+            <th>순이익</th><th>순이익률</th><th>EBITDA</th><th>주당배당금</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td>2025</td>
+            <td>미확인</td>
+            <td>미확인</td>
+            <td>722.5억원</td>
+            <td>미확인</td>
+            <td>577.4억원</td>
+            <td>미확인</td>
+            <td>967.3억원</td>
+            <td>370원</td>
+          </tr>
+          
+          <tr>
+            <td>2024</td>
+            <td>1.80조원</td>
+            <td>13.5%</td>
+            <td>546.9억원</td>
+            <td>3.0%</td>
+            <td>361.5억원</td>
+            <td>2.0%</td>
+            <td>744.8억원</td>
+            <td>180원</td>
+          </tr>
+          
+          <tr>
+            <td>2023</td>
+            <td>1.58조원</td>
+            <td>미확인</td>
+            <td>651.7억원</td>
+            <td>4.1%</td>
+            <td>535.1억원</td>
+            <td>3.4%</td>
+            <td>816.6억원</td>
+            <td>400원</td>
+          </tr>
+          
+        </tbody>
+      </table>
+      
+      <p class="note">EBITDA는 영업이익 + 감가상각비/무형자산상각비로 산출했으며, 공시에서 상각비를 특정할 수 없는 연도는 "미확인"으로 표기했습니다(임의 추정 없음).</p>
+      
+      <p class="note">현재가/시가총액은 비공식 참고용 시세(yfinance)이며 공식 공시 데이터가 아닙니다.</p>
+      
+    </div>
+  </section>
+
+  
+  <section>
+    <h2>최근 5분기 경영현황 <span class="badge fact">공식데이터</span></h2>
+    <div class="card">
+      <div class="legend">
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-1)"></span>매출액</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-2)"></span>영업이익</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-3)"></span>순이익</span>
+        
+      </div>
+      <svg viewBox="0 0 720 340" width="100%" role="img" aria-label="현대차증권 5분기 재무 추이 차트" class="fin-chart"><line x1="88" y1="304.0" x2="704" y2="304.0" class="grid-line" /><text x="80" y="304.0" class="axis-label" text-anchor="end" dominant-baseline="middle">-3,984.2억원</text><line x1="88" y1="232.0" x2="704" y2="232.0" class="grid-line" /><text x="80" y="232.0" class="axis-label" text-anchor="end" dominant-baseline="middle">-2,842.7억원</text><line x1="88" y1="160.0" x2="704" y2="160.0" class="grid-line" /><text x="80" y="160.0" class="axis-label" text-anchor="end" dominant-baseline="middle">-1,701.2억원</text><line x1="88" y1="88.0" x2="704" y2="88.0" class="grid-line" /><text x="80" y="88.0" class="axis-label" text-anchor="end" dominant-baseline="middle">-559.7억원</text><line x1="88" y1="16.0" x2="704" y2="16.0" class="grid-line" /><text x="80" y="16.0" class="axis-label" text-anchor="end" dominant-baseline="middle">581.8억원</text><line x1="88" y1="52.7" x2="704" y2="52.7" class="baseline" /><path d="M117.6,52.69493685856582 L137.6,52.69493685856582 L137.6,300.0 Q137.6,304.0 133.6,304.0 L121.6,304.0 Q117.6,304.0 117.6,300.0 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2025 Q2 매출액: -3,984.2억원</title></path><path d="M161.6,52.69493685856582 L161.6,52.69493685856582 Q161.6,51.78664634226468 162.50829051630114,51.78664634226468 L180.69170948369884,51.78664634226468 Q181.6,51.78664634226468 181.6,52.69493685856582 L181.6,52.69493685856582 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2025 Q2 순이익: 14.4억원</title></path><text x="149.6" y="324" class="axis-label" text-anchor="middle">2025 Q2</text><path d="M284.79999999999995,52.69493685856582 L304.79999999999995,52.69493685856582 L304.79999999999995,54.06078923507536 Q304.79999999999995,58.06078923507536 300.79999999999995,58.06078923507536 L288.79999999999995,58.06078923507536 Q284.79999999999995,58.06078923507536 284.79999999999995,54.06078923507536 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2025 Q3 순이익: -85.1억원</title></path><text x="272.8" y="324" class="axis-label" text-anchor="middle">2025 Q3</text><path d="M386.0,52.69493685856582 L386.0,20.0 Q386.0,16.0 390.0,16.0 L402.0,16.0 Q406.0,16.0 406.0,20.0 L406.0,52.69493685856582 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2025 Q4 영업이익: 581.8억원</title></path><path d="M408.0,52.69493685856582 L408.0,27.985387455814138 Q408.0,23.985387455814138 412.0,23.985387455814138 L424.0,23.985387455814138 Q428.0,23.985387455814138 428.0,27.985387455814138 L428.0,52.69493685856582 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2025 Q4 순이익: 455.2억원</title></path><text x="396.0" y="324" class="axis-label" text-anchor="middle">2025 Q4</text><path d="M509.20000000000005,52.69493685856582 L509.20000000000005,36.31453764175613 Q509.20000000000005,32.31453764175613 513.2,32.31453764175613 L525.2,32.31453764175613 Q529.2,32.31453764175613 529.2,36.31453764175613 L529.2,52.69493685856582 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2026 Q1 영업이익: 323.1억원</title></path><path d="M531.2,52.69493685856582 L531.2,39.92373092944717 Q531.2,35.92373092944717 535.2,35.92373092944717 L547.2,35.92373092944717 Q551.2,35.92373092944717 551.2,39.92373092944717 L551.2,52.69493685856582 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2026 Q1 순이익: 265.9억원</title></path><text x="519.2" y="324" class="axis-label" text-anchor="middle">2026 Q1</text><path d="M632.4,52.69493685856582 L652.4,52.69493685856582 L652.4,57.01525644226599 Q652.4,61.01525644226599 648.4,61.01525644226599 L636.4,61.01525644226599 Q632.4,61.01525644226599 632.4,57.01525644226599 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2026 Q2 영업이익: -131.9억원</title></path><path d="M654.4,52.69493685856582 L654.4,52.69493685856582 Q654.4,48.82524080474119 658.2696960538246,48.82524080474119 L670.5303039461753,48.82524080474119 Q674.4,48.82524080474119 674.4,52.69493685856582 L674.4,52.69493685856582 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2026 Q2 순이익: 61.4억원</title></path><text x="642.4" y="324" class="axis-label" text-anchor="middle">2026 Q2</text></svg>
+      <table class="fin-table">
+        <thead>
+          <tr>
+            <th>분기</th><th>매출액</th><th>전분기비</th><th>영업이익</th><th>영업이익률</th>
+            <th>순이익</th><th>순이익률</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td>2026 Q2</td>
+            <td>미확인</td>
+            <td>미확인</td>
+            <td>-131.9억원</td>
+            <td>미확인</td>
+            <td>61.4억원</td>
+            <td>미확인</td>
+          </tr>
+          
+          <tr>
+            <td>2026 Q1</td>
+            <td>미확인</td>
+            <td>미확인</td>
+            <td>323.1억원</td>
+            <td>미확인</td>
+            <td>265.9억원</td>
+            <td>미확인</td>
+          </tr>
+          
+          <tr>
+            <td>2025 Q4</td>
+            <td>미확인</td>
+            <td>미확인</td>
+            <td>581.8억원</td>
+            <td>미확인</td>
+            <td>455.2억원</td>
+            <td>미확인</td>
+          </tr>
+          
+          <tr>
+            <td>2025 Q3</td>
+            <td>미확인</td>
+            <td>미확인</td>
+            <td>미확인</td>
+            <td>미확인</td>
+            <td>-85.1억원</td>
+            <td>미확인</td>
+          </tr>
+          
+          <tr>
+            <td>2025 Q2</td>
+            <td>-3,984.2억원</td>
+            <td>미확인</td>
+            <td>미확인</td>
+            <td>미확인</td>
+            <td>14.4억원</td>
+            <td>-0.4%</td>
+          </tr>
+          
+        </tbody>
+      </table>
+      <p class="note">"전분기비"는 전년 동기가 아닌 직전 분기 대비 증감률입니다(계절성이 있는 업종은 전년 동기와 다를 수 있음에 유의).</p>
+      <p class="note">한국 기업은 분기·반기·사업보고서의 누적 수치를 차감해, 미국 기업은 연간(10-K) 수치에서 1~3분기(10-Q) 합계를 뺀 값으로 4분기를 역산해 단독 분기 실적을 산출합니다. 계산에 필요한 원자료 중 하나라도 확인되지 않으면 해당 분기는 표에서 제외했습니다(추정 없음). 이 방식 특성상 일회성 손익이나 정정공시가 있으면 특정 분기의 수치가 유달리 크거나 작게 나타날 수 있으니, 크게 튀는 값은 원문 공시와 대조해 보시길 권장합니다.</p>
+    </div>
+  </section>
+  
+
+  <section>
+    <h2>주주환원정책 <span class="badge ai">AI 해석</span></h2>
+    <div class="card"><p>제공된 공시 데이터를 바탕으로 현대차증권의 최근 3개년 주주환원정책의 추세를 분석한 결과는 다음과 같다.</p>
+<ul>
+    <li><strong>2023년</strong>: 당기순이익 535.1억원을 기록하였으며, 주당배당금은 400원이었다.</li>
+    <li><strong>2024년</strong>: 당기순이익이 361.5억원으로 감소함에 따라, 주당배당금 역시 180원으로 하락하여 배당 규모가 축소되는 추세를 보였다.</li>
+    <li><strong>2025년</strong>: 당기순이익이 577.4억원으로 반등하였고, 주당배당금 또한 370원으로 증가하여 실적 변동에 연동된 배당 성향의 움직임이 확인된다.</li>
+    <li><strong>자사주 매입 상세</strong>: 공시 데이터에서 확인되지 않음.</li>
+</ul>
+<p>결론적으로 현대차증권의 주당배당금은 순이익의 증감에 따라 등락을 거듭하여, 일관된 증가나 유지보다는 실적 연동형의 추세를 나타내고 있다.</p></div>
+  </section>
+
+  <section>
+    <h2>산업 전망 (1년 · 5년 · 10년) <span class="badge ai">AI 해석</span></h2>
+    <div class="card"><p><strong>1년 시계열 전망:</strong></p>
+<ul>
+    <li><strong>주요 흐름/변화 요인:</strong> 미국의 물가 상승 압력에 따른 연방준비제도(Fed)의 기준금리 인상 기조가 이어지는 가운데, 향후 인상 속도가 완만하다면 증시에 미치는 충격은 제한적일 수 있다는 분석이 제기된다 <a href="https://www.mk.co.kr/article/12152474" target="_blank" rel="noopener noreferrer">[출처]</a>. 또한, AI 투자 확대 등에 따른 중금리 기조 변화와 관련해 최종금리 전망치가 조정되는 국면이다 <a href="https://news.einfomax.co.kr/news/articleView.html?idxno=4434462" target="_blank" rel="noopener noreferrer">[출처]</a>. 증권업계 내부적으로는 임금협상 및 조직 개편(리서치센터 재편 및 콘텐츠 활용 다변화 등)의 흐름이 나타나고 있다 <a href="https://www.fntimes.com/html/view.php?ud=2026091815233885232a735e27af_18" target="_blank" rel="noopener noreferrer">[출처]</a> <a href="https://www.newsway.co.kr/news/view?ud=2026091414405534967" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+    <li><strong>이 회사에 미칠 영향:</strong> 금리 변동성과 대내외 거시경제 환경 변화는 증권사의 자산관리(WM) 및 리서치 부문의 전략 수립에 직접적인 영향을 준다. 세대별 맞춤형 WM 콘텐츠 확대와 리서치 역량 재편을 통해 대응을 도모하고 있으나, 시장 변동성에 따른 증시 영향은 기회와 위협 요인이 혼재되어 있다 <a href="https://www.mk.co.kr/article/12152474" target="_blank" rel="noopener noreferrer">[출처]</a> <a href="https://www.newsway.co.kr/news/view?ud=2026091414405534967" target="_blank" rel="noopener noreferrer">[출처]</a> <a href="https://www.imaeil.com/page/view/2026070809570014403" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+</ul>
+
+<p><strong>5년 시계열 전망:</strong></p>
+<ul>
+    <li><strong>주요 흐름/변화 요인:</strong> 제공된 자료로는 확인되지 않음 <a href="https://biz.chosun.com/stock/stock_general/2026/09/18/TGAW6I4VT5GGNG6B4LSPOXQX4Y/?utm_source=naver&utm_medium=original&utm_campaign=biz" target="_blank" rel="noopener noreferrer">[출처]</a></li>
+    <li><strong>이 회사에 미칠 영향:</strong> 제공된 자료로는 확인되지 않음 <a href="https://biz.chosun.com/stock/stock_general/2026/09/18/TGAW6I4VT5GGNG6B4LSPOXQX4Y/?utm_source=naver&utm_medium=original&utm_campaign=biz" target="_blank" rel="noopener noreferrer">[출처]</a></li>
+</ul>
+
+<p><strong>10년 시계열 전망:</strong></p>
+<ul>
+    <li><strong>주요 흐름/변화 요인:</strong> 제공된 자료로는 확인되지 않음 <a href="https://biz.chosun.com/stock/stock_general/2026/09/18/TGAW6I4VT5GGNG6B4LSPOXQX4Y/?utm_source=naver&utm_medium=original&utm_campaign=biz" target="_blank" rel="noopener noreferrer">[출처]</a></li>
+    <li><strong>이 회사에 미칠 영향:</strong> 제공된 자료로는 확인되지 않음 <a href="https://biz.chosun.com/stock/stock_general/2026/09/18/TGAW6I4VT5GGNG6B4LSPOXQX4Y/?utm_source=naver&utm_medium=original&utm_campaign=biz" target="_blank" rel="noopener noreferrer">[출처]</a></li>
+</ul>
+
+<p><strong>리스크 및 불확실성:</strong> 전망이 멀수록(특히 5년 및 10년 시계열) 거시경제 지표, 통화정책 변화, 산업 구조 변동에 따른 불확실성이 크게 확대된다. 본 분석은 단정적인 예측을 배제하며, 제공된 검색 외의 장기적 요인들에 대해서는 추가적인 검증이 요구된다 <a href="https://biz.chosun.com/stock/stock_general/2026/09/18/TGAW6I4VT5GGNG6B4LSPOXQX4Y/?utm_source=naver&utm_medium=original&utm_campaign=biz" target="_blank" rel="noopener noreferrer">[출처]</a>.</p></div>
+  </section>
+
+  <section>
+    <h2>데이터 출처</h2>
+    <div class="card">
+      <p><strong>공식 재무데이터</strong></p>
+      <ul class="source-list">
+        <li>DART 전자공시 사업보고서(reprt_code=11011), corp_code=00137997</li>
+        <li>DART 전자공시 분기·반기·사업보고서, corp_code=00137997</li>
+      </ul>
+      
+      <p><strong>검색 기반 참고자료</strong></p>
+      <ul class="source-list">
+        
+        <li><a href="http://www.4th.kr/news/articleView.html?idxno=2118320" target="_blank" rel="noopener noreferrer">현대차증권, 조직개편 이어 임협 타결..사업·노사 체계 정비</a> · Fri, 18 Sep 2026 11:24:00 +0900</li>
+        
+        <li><a href="https://www.bloter.net/news/articleView.html?idxno=673866" target="_blank" rel="noopener noreferrer">[현대차증권 재무체력]③ 수익원 바뀌어도 흔들린 이익 안정성</a> · Fri, 18 Sep 2026 07:55:00 +0900</li>
+        
+        <li><a href="https://www.yna.co.kr/view/AKR20260914021100008?input=1195m" target="_blank" rel="noopener noreferrer">현대차증권, 롯데칠성 목표가 하향…&#34;비용 불확실성 남아&#34;</a> · Mon, 14 Sep 2026 08:32:00 +0900</li>
+        
+        <li><a href="https://view.asiae.co.kr/article/2026091109540549675" target="_blank" rel="noopener noreferrer">[주末머니]&#34;성장·배당 모두 그립감 좋다&#34; 9년만에 숙원 푼 이 기업</a> · Sat, 12 Sep 2026 09:00:00 +0900</li>
+        
+        <li><a href="https://www.hankyung.com/article/2026091420216" target="_blank" rel="noopener noreferrer">&#34;롯데칠성, 올 하반기 원재료비 높아 비용 측면 불확실…목표가↓&#34;-현대...</a> · Mon, 14 Sep 2026 08:54:00 +0900</li>
+        
+        <li><a href="https://www.newspim.com/news/view/20260917000097" target="_blank" rel="noopener noreferrer">[모닝 리포트] &#34;현대모비스, 자동차 부품 넘어 로보틱스·SDV로 확장&#34;</a> · Thu, 17 Sep 2026 09:17:00 +0900</li>
+        
+        <li><a href="https://www.newsis.com/view/NISX20260909_0003781935" target="_blank" rel="noopener noreferrer">현대차證 &#34;클리오, 목표가 1만7000원으로 상향…수익성 개선 기대&#34;</a> · Wed, 09 Sep 2026 09:03:00 +0900</li>
+        
+        <li><a href="http://www.press9.kr/news/articleView.html?idxno=82659" target="_blank" rel="noopener noreferrer">롯데칠성, 원부자재 비용 부담 지속…목표가 17만→14만원-현대차증권</a> · Mon, 14 Sep 2026 13:56:00 +0900</li>
+        
+        <li><a href="https://news.tf.co.kr/read/economy/2360609.htm" target="_blank" rel="noopener noreferrer">&#39;1037억→224억&#39; 현대차증권 자산운용 &#39;흔들&#39;…조직개편으로 돌파구 찾나</a> · Wed, 02 Sep 2026 00:01:00 +0900</li>
+        
+        <li><a href="http://www.press9.kr/news/articleView.html?idxno=82075" target="_blank" rel="noopener noreferrer">한올바이오파마, 이뮤노반트와 기업가치 격차 확대…&#34;저평가 해소 가능...</a> · Thu, 03 Sep 2026 09:14:00 +0900</li>
+        
+        <li><a href="https://news.bizwatch.co.kr/article/market/2026/08/27/0007" target="_blank" rel="noopener noreferrer">수익성 목표 높인 현대차…증권가는 왜 목표주가 낮췄나</a> · Thu, 27 Aug 2026 10:20:00 +0900</li>
+        
+        <li><a href="https://www.thebell.co.kr/free/content/ArticleView.asp?key=202609091331323920103794" target="_blank" rel="noopener noreferrer">[더벨][퇴직연금 캡티브 시험대] 삼성증권, 그룹사 힘입어 고속성장…경...</a> · Fri, 11 Sep 2026 17:12:00 +0900</li>
+        
+        <li><a href="https://www.kukinews.com/article/view/kuk202609160211" target="_blank" rel="noopener noreferrer">배형근號 1300억 ‘디지털 대전환’…현대차증권 어디까지 왔나</a> · Thu, 17 Sep 2026 06:02:00 +0900</li>
+        
+        <li><a href="https://www.sisaon.co.kr/news/articleView.html?idxno=204489" target="_blank" rel="noopener noreferrer">현대차증권, 교보증권 DCM 인력 영입…IB 새 판 짠다</a> · Wed, 16 Sep 2026 15:44:00 +0900</li>
+        
+        <li><a href="https://news.bizwatch.co.kr/article/market/2026/09/11/0001" target="_blank" rel="noopener noreferrer">장문수의 첫 승부수…현대차증권 리서치 &#39;칸막이&#39; 허문다</a> · Fri, 11 Sep 2026 09:30:00 +0900</li>
+        
+        <li><a href="http://www.thebigdata.co.kr/view.php?ud=2026090415210719830ecbf9426b_23" target="_blank" rel="noopener noreferrer">SK하이닉스 점유율 14%p 하락에도…韓 HBM 83% ‘굳건’</a> · Fri, 04 Sep 2026 15:50:00 +0900</li>
+        
+        <li><a href="https://biz.chosun.com/stock/stock_general/2026/09/18/TGAW6I4VT5GGNG6B4LSPOXQX4Y/?utm_source=naver&amp;utm_medium=original&amp;utm_campaign=biz" target="_blank" rel="noopener noreferrer">현대차證 “한국전력, 연료비 부담 상승…목표가 4만3000원 하향&#34;</a> · Fri, 18 Sep 2026 08:46:00 +0900</li>
+        
+        <li><a href="https://www.fntimes.com/html/view.php?ud=2026091815233885232a735e27af_18" target="_blank" rel="noopener noreferrer">현대차證 임금 2.5% 인상·자사주 500주…증권업계 임금협상 주목</a> · Fri, 18 Sep 2026 15:54:00 +0900</li>
+        
+        <li><a href="https://www.edaily.co.kr/News/Read?newsId=02581366645581432&amp;mediaCodeNo=257&amp;utm_source=naver&amp;utm_medium=referral&amp;utm_campaign=news_syndication&amp;utm_content=original_article" target="_blank" rel="noopener noreferrer">LX하우시스, B2C 호조·비건축자재 매출 증가…“실적 회복 기대”-현대...</a> · Fri, 18 Sep 2026 08:06:00 +0900</li>
+        
+        <li><a href="https://www.mk.co.kr/article/12152474" target="_blank" rel="noopener noreferrer">“美 금리인상 충격을 노리라고?”…9월 조정이 연말 랠리 잡을 기회라...</a> · Mon, 14 Sep 2026 18:25:00 +0900</li>
+        
+      </ul>
+      
+    </div>
+  </section>
+
+  <footer>
+    Generated by 종목분석 Agent · 2026-09-20 03:17
+  </footer>
+</div>
+
+<script>
+  (function () {
+    var saved = localStorage.getItem('stockagent-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  })();
+  function toggleTheme() {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('stockagent-theme', next);
+  }
+</script>
+</body>
+</html>
