@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SK텔레콤(017670) 종목분석 리포트</title>
+<style>
+  :root {
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --grid-line:      #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6;
+    --series-2:       #eb6834;
+    --series-3:       #1baf7a;
+    --series-4:       #eda100;
+    --status-good:    #0ca30c;
+    --status-warning: #fab219;
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --grid-line:      #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --series-1:       #3987e5;
+    --series-2:       #d95926;
+    --series-3:       #199e70;
+    --series-4:       #c98500;
+    --status-good:    #0ca30c;
+    --status-warning: #fab219;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --grid-line:      #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --series-1:       #3987e5;
+      --series-2:       #d95926;
+      --series-3:       #199e70;
+      --series-4:       #c98500;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page-plane);
+    color: var(--text-primary);
+    line-height: 1.6;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 24px 20px 64px; }
+  header.report-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 16px; margin-bottom: 8px; flex-wrap: wrap;
+  }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  .subtitle { color: var(--text-secondary); font-size: 14px; margin: 0; }
+  .meta { color: var(--text-muted); font-size: 13px; margin-top: 6px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+  .chip-btn {
+    background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 12px; font-size: 13px; cursor: pointer;
+    text-decoration: none; display: inline-block; white-space: nowrap;
+  }
+  .chip-btn:hover { border-color: var(--series-1); }
+  .disclaimer {
+    background: var(--surface-1); border: 1px solid var(--border); border-left: 4px solid var(--status-warning);
+    border-radius: 6px; padding: 12px 16px; font-size: 13px; color: var(--text-secondary); margin: 16px 0 28px;
+  }
+  section { margin: 32px 0; }
+  h2 {
+    font-size: 18px; border-bottom: 1px solid var(--grid-line); padding-bottom: 8px; margin-bottom: 14px;
+  }
+  .badge {
+    display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+    margin-left: 8px; vertical-align: middle;
+  }
+  .badge.fact { background: rgba(42,120,214,0.14); color: var(--series-1); }
+  .badge.ai { background: rgba(235,104,52,0.14); color: var(--series-2); }
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px;
+  }
+  .card p:first-child { margin-top: 0; }
+  .card p:last-child { margin-bottom: 0; }
+  .card a { color: var(--series-1); }
+  table.fin-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 14px; }
+  table.fin-table th, table.fin-table td {
+    text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--grid-line);
+    font-variant-numeric: tabular-nums;
+  }
+  table.fin-table th:first-child, table.fin-table td:first-child { text-align: left; }
+  table.fin-table th { color: var(--text-secondary); font-weight: 600; font-size: 12px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 10px 0 4px; font-size: 12px; color: var(--text-secondary); }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .fin-chart .grid-line { stroke: var(--grid-line); stroke-width: 1; }
+  .fin-chart .baseline { stroke: var(--baseline); stroke-width: 1; }
+  .fin-chart .axis-label { fill: var(--text-muted); font-size: 10px; }
+  .fin-chart .bar { transition: opacity .15s; }
+  .fin-chart .bar:hover { opacity: 0.75; }
+  .chart-empty { color: var(--text-muted); font-size: 13px; }
+  .kpi-row { display: flex; gap: 24px; margin: 10px 0 4px; flex-wrap: wrap; }
+  .kpi { font-size: 13px; color: var(--text-secondary); }
+  .kpi b { display: block; font-size: 18px; color: var(--text-primary); font-weight: 600; }
+  .note { font-size: 12px; color: var(--text-muted); margin-top: 10px; }
+  ul.source-list { font-size: 13px; color: var(--text-secondary); padding-left: 18px; }
+  ul.source-list a { color: var(--series-1); }
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--grid-line); font-size: 12px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="report-header">
+    <div>
+      <h1>SK텔레콤 <span class="subtitle">(KR · 017670)</span></h1>
+      <p class="subtitle">업종 정보 미확인</p>
+      <p class="meta">리포트 생성: 2026-09-20 04:07 · 재무 데이터 기준일: 2026-09-20</p>
+    </div>
+    <div class="header-actions">
+      <a class="chip-btn" href="./index.html">전체 리포트 목록</a>
+      <button id="theme-toggle" class="chip-btn" type="button" onclick="toggleTheme()">라이트/다크 전환</button>
+    </div>
+  </header>
+
+  <div class="disclaimer">
+    본 리포트는 AI가 생성한 콘텐츠입니다. <span class="badge fact">공식데이터</span> 배지가 붙은 수치는
+    DART/SEC 공시 원문을 코드로 그대로 파싱한 값이며, <span class="badge ai">AI 해석</span> 배지가 붙은
+    서술은 검색 자료를 근거로 AI가 작성한 해석/전망입니다. 투자 판단과 그 결과에 대한 책임은 전적으로
+    이용자 본인에게 있으며, 본 리포트는 투자 권유가 아닙니다.
+  </div>
+
+  <section>
+    <h2>사업 분야 · 경쟁현황 · 경쟁력 <span class="badge ai">AI 해석</span></h2>
+    <div class="card"><p>제공된 자료를 바탕으로 SK텔레콤의 사업 분야, 경쟁 현황, 경쟁력에 대해 분석한 내용은 다음과 같다.</p>
+<ul>
+  <li><strong>주요 사업 부문 및 제품·서비스 구성:</strong> 
+    <ul>
+      <li>이동통신사업(MNO)을 영위하며, 공식 온라인몰 T 다이렉트샵을 통해 아이폰 신제품 등을 판매하고 있다 <a href="https://www.newsinside.kr/news/articleView.html?idxno=5005035" target="_blank" rel="noopener noreferrer">[출처]</a> <a href="https://www.newsis.com/view/NISX20260911_0003786009" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+      <li>AI 팩토리 및 스마트 제조 플랫폼 등 인공지능(AI) 관련 사업을 전개하고 있다 <a href="http://www.hansbiz.co.kr/news/articleView.html?idxno=865590" target="_blank" rel="noopener noreferrer">[출처]</a> <a href="https://it.chosun.com/news/articleView.html?idxno=2023092170260" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+      <li>데이터센터 전담 자회사 SK하이퍼 설립 및 SK브로드밴드 분할 등을 통해 데이터센터 사업을 확장하고 있다 <a href="https://www.fnnews.com/news/202609091017139139" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+      <li>제공된 자료에 따르면 SK스토아 인수 관련 거래구조 재개 등이 언급되어 있다 <a href="https://www.sedaily.com/article/20090099?ref=naver" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+    </ul>
+  </li>
+  <li><strong>속한 산업 내 경쟁현황:</strong> 
+    <ul>
+      <li>국내 통신 상장기업 브랜드평판에서 KT에 이어 SK텔레콤이 2위를 기록한 바 있으며, 그 뒤로 LG유플러스가 위치한다 <a href="http://www.thebigdata.co.kr/view.php?ud=202609090806297588d0a8833aad_23" target="_blank" rel="noopener noreferrer">[출처]</a>. 구체적인 전체 시장점유율 수치는 제공된 자료에서 확인되지 않음.</li>
+    </ul>
+  </li>
+  <li><strong>경쟁력(강점)과 약점/리스크 요인:</strong> 
+    <ul>
+      <li><strong>강점:</strong> 국내 유일의 AI 풀스택 역량을 갖추고 있으며, SK그룹 차원의 지원과 안정적인 자금 확보를 바탕으로 경쟁사보다 공격적인 데이터센터 확장이 가능하다는 평가를 받는다 <a href="https://www.namdonews.com/news/articleView.html?idxno=921506" target="_blank" rel="noopener noreferrer">[출처]</a>. 또한 미국 앤트로픽에 최초로 지분 투자한 이력이 있으며, 동사의 가치가 크게 상승한 바 있다 <a href="http://www.inews24.com/view/1997648" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+      <li><strong>약점/리스크 요인:</strong> 제공된 자료로는 회사의 구체적인 약점이나 리스크 요인에 대해 확인되지 않음.</li>
+    </ul>
+  </li>
+</ul></div>
+  </section>
+
+  <section>
+    <h2>최근 5개년 경영현황 <span class="badge fact">공식데이터</span></h2>
+    <div class="card">
+      <div class="kpi-row">
+        <div class="kpi">매출 CAGR<b>0.5%</b></div>
+        <div class="kpi">순이익 CAGR<b>-37.2%</b></div>
+        
+        <div class="kpi">현재가(비공식 참고)<b>89,200원</b></div>
+        
+      </div>
+      <div class="legend">
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-1)"></span>매출액</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-2)"></span>영업이익</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-3)"></span>순이익</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-4)"></span>EBITDA</span>
+        
+      </div>
+      <svg viewBox="0 0 720 340" width="100%" role="img" aria-label="SK텔레콤 5개년 재무 추이 차트" class="fin-chart"><line x1="88" y1="304.0" x2="704" y2="304.0" class="grid-line" /><text x="80" y="304.0" class="axis-label" text-anchor="end" dominant-baseline="middle">0원</text><line x1="88" y1="232.0" x2="704" y2="232.0" class="grid-line" /><text x="80" y="232.0" class="axis-label" text-anchor="end" dominant-baseline="middle">4.49조원</text><line x1="88" y1="160.0" x2="704" y2="160.0" class="grid-line" /><text x="80" y="160.0" class="axis-label" text-anchor="end" dominant-baseline="middle">8.97조원</text><line x1="88" y1="88.0" x2="704" y2="88.0" class="grid-line" /><text x="80" y="88.0" class="axis-label" text-anchor="end" dominant-baseline="middle">13.46조원</text><line x1="88" y1="16.0" x2="704" y2="16.0" class="grid-line" /><text x="80" y="16.0" class="axis-label" text-anchor="end" dominant-baseline="middle">17.94조원</text><line x1="88" y1="304.0" x2="704" y2="304.0" class="baseline" /><path d="M106.6,304.0 L106.6,39.13552165369637 Q106.6,35.13552165369637 110.6,35.13552165369637 L122.6,35.13552165369637 Q126.6,35.13552165369637 126.6,39.13552165369637 L126.6,304.0 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2021년 매출액: 16.75조원</title></path><path d="M128.6,304.0 L128.6,285.7319345179419 Q128.6,281.7319345179419 132.6,281.7319345179419 L144.6,281.7319345179419 Q148.6,281.7319345179419 148.6,285.7319345179419 L148.6,304.0 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2021년 영업이익: 1.39조원</title></path><path d="M150.6,304.0 L150.6,269.168049980912 Q150.6,265.168049980912 154.6,265.168049980912 L166.6,265.168049980912 Q170.6,265.168049980912 170.6,269.168049980912 L170.6,304.0 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2021년 순이익: 2.42조원</title></path><text x="149.6" y="324" class="axis-label" text-anchor="middle">2021</text><path d="M229.79999999999998,304.0 L229.79999999999998,30.203843581898475 Q229.79999999999998,26.203843581898475 233.79999999999998,26.203843581898475 L245.79999999999998,26.203843581898475 Q249.79999999999998,26.203843581898475 249.79999999999998,30.203843581898475 L249.79999999999998,304.0 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2022년 매출액: 17.30조원</title></path><path d="M251.79999999999998,304.0 L251.79999999999998,282.1214938690208 Q251.79999999999998,278.1214938690208 255.79999999999998,278.1214938690208 L267.79999999999995,278.1214938690208 Q271.79999999999995,278.1214938690208 271.79999999999995,282.1214938690208 L271.79999999999995,304.0 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2022년 영업이익: 1.61조원</title></path><path d="M273.79999999999995,304.0 L273.79999999999995,292.78450045926536 Q273.79999999999995,288.78450045926536 277.79999999999995,288.78450045926536 L289.79999999999995,288.78450045926536 Q293.79999999999995,288.78450045926536 293.79999999999995,292.78450045926536 L293.79999999999995,304.0 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2022년 순이익: 9,478.3억원</title></path><text x="272.8" y="324" class="axis-label" text-anchor="middle">2022</text><path d="M353.0,304.0 L353.0,25.331158156336834 Q353.0,21.331158156336834 357.0,21.331158156336834 L369.0,21.331158156336834 Q373.0,21.331158156336834 373.0,25.331158156336834 L373.0,304.0 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2023년 매출액: 17.61조원</title></path><path d="M375.0,304.0 L375.0,279.85587445777344 Q375.0,275.85587445777344 379.0,275.85587445777344 L391.0,275.85587445777344 Q395.0,275.85587445777344 395.0,279.85587445777344 L395.0,304.0 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2023년 영업이익: 1.75조원</title></path><path d="M397.0,304.0 L397.0,289.6043114255486 Q397.0,285.6043114255486 401.0,285.6043114255486 L413.0,285.6043114255486 Q417.0,285.6043114255486 417.0,289.6043114255486 L417.0,304.0 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2023년 순이익: 1.15조원</title></path><text x="396.0" y="324" class="axis-label" text-anchor="middle">2023</text><path d="M476.20000000000005,304.0 L476.20000000000005,20.0 Q476.20000000000005,16.0 480.20000000000005,16.0 L492.20000000000005,16.0 Q496.20000000000005,16.0 496.20000000000005,20.0 L496.20000000000005,304.0 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2024년 매출액: 17.94조원</title></path><path d="M498.20000000000005,304.0 L498.20000000000005,278.72887592611823 Q498.20000000000005,274.72887592611823 502.20000000000005,274.72887592611823 L514.2,274.72887592611823 Q518.2,274.72887592611823 518.2,278.72887592611823 L518.2,304.0 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2024년 영업이익: 1.82조원</title></path><path d="M520.2,304.0 L520.2,285.7330100667151 Q520.2,281.7330100667151 524.2,281.7330100667151 L536.2,281.7330100667151 Q540.2,281.7330100667151 540.2,285.7330100667151 L540.2,304.0 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2024년 순이익: 1.39조원</title></path><text x="519.2" y="324" class="axis-label" text-anchor="middle">2024</text><path d="M599.4,304.0 L599.4,33.506902023225635 Q599.4,29.50690202322563 603.4,29.50690202322563 L615.4,29.50690202322563 Q619.4,29.50690202322563 619.4,33.506902023225635 L619.4,304.0 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2025년 매출액: 17.10조원</title></path><path d="M621.4,304.0 L621.4,290.7717152745484 Q621.4,286.7717152745484 625.4,286.7717152745484 L637.4,286.7717152745484 Q641.4,286.7717152745484 641.4,290.7717152745484 L641.4,304.0 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2025년 영업이익: 1.07조원</title></path><path d="M643.4,304.0 L643.4,301.97878901435286 Q643.4,297.97878901435286 647.4,297.97878901435286 L659.4,297.97878901435286 Q663.4,297.97878901435286 663.4,301.97878901435286 L663.4,304.0 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2025년 순이익: 3,750.8억원</title></path><text x="642.4" y="324" class="axis-label" text-anchor="middle">2025</text></svg>
+      <table class="fin-table">
+        <thead>
+          <tr>
+            <th>연도</th><th>매출액</th><th>YoY</th><th>영업이익</th><th>영업이익률</th>
+            <th>순이익</th><th>순이익률</th><th>EBITDA</th><th>주당배당금</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td>2025</td>
+            <td>17.10조원</td>
+            <td>-4.7%</td>
+            <td>1.07조원</td>
+            <td>6.3%</td>
+            <td>3,750.8억원</td>
+            <td>2.2%</td>
+            <td>미확인</td>
+            <td>1,660원</td>
+          </tr>
+          
+          <tr>
+            <td>2024</td>
+            <td>17.94조원</td>
+            <td>1.9%</td>
+            <td>1.82조원</td>
+            <td>10.2%</td>
+            <td>1.39조원</td>
+            <td>7.7%</td>
+            <td>미확인</td>
+            <td>3,540원</td>
+          </tr>
+          
+          <tr>
+            <td>2023</td>
+            <td>17.61조원</td>
+            <td>1.8%</td>
+            <td>1.75조원</td>
+            <td>10.0%</td>
+            <td>1.15조원</td>
+            <td>6.5%</td>
+            <td>미확인</td>
+            <td>3,540원</td>
+          </tr>
+          
+          <tr>
+            <td>2022</td>
+            <td>17.30조원</td>
+            <td>3.3%</td>
+            <td>1.61조원</td>
+            <td>9.3%</td>
+            <td>9,478.3억원</td>
+            <td>5.5%</td>
+            <td>미확인</td>
+            <td>3,320원</td>
+          </tr>
+          
+          <tr>
+            <td>2021</td>
+            <td>16.75조원</td>
+            <td>미확인</td>
+            <td>1.39조원</td>
+            <td>8.3%</td>
+            <td>2.42조원</td>
+            <td>14.4%</td>
+            <td>미확인</td>
+            <td>3,295원</td>
+          </tr>
+          
+        </tbody>
+      </table>
+      
+      <p class="note">EBITDA는 영업이익 + 감가상각비/무형자산상각비로 산출했으며, 공시에서 상각비를 특정할 수 없는 연도는 "미확인"으로 표기했습니다(임의 추정 없음).</p>
+      
+      <p class="note">현재가/시가총액은 비공식 참고용 시세(yfinance)이며 공식 공시 데이터가 아닙니다.</p>
+      
+    </div>
+  </section>
+
+  
+  <section>
+    <h2>최근 5분기 경영현황 <span class="badge fact">공식데이터</span></h2>
+    <div class="card">
+      <div class="legend">
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-1)"></span>매출액</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-2)"></span>영업이익</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-3)"></span>순이익</span>
+        
+      </div>
+      <svg viewBox="0 0 720 340" width="100%" role="img" aria-label="SK텔레콤 5분기 재무 추이 차트" class="fin-chart"><line x1="88" y1="304.0" x2="704" y2="304.0" class="grid-line" /><text x="80" y="304.0" class="axis-label" text-anchor="end" dominant-baseline="middle">-3,607.0억원</text><line x1="88" y1="232.0" x2="704" y2="232.0" class="grid-line" /><text x="80" y="232.0" class="axis-label" text-anchor="end" dominant-baseline="middle">3.01조원</text><line x1="88" y1="160.0" x2="704" y2="160.0" class="grid-line" /><text x="80" y="160.0" class="axis-label" text-anchor="end" dominant-baseline="middle">6.38조원</text><line x1="88" y1="88.0" x2="704" y2="88.0" class="grid-line" /><text x="80" y="88.0" class="axis-label" text-anchor="end" dominant-baseline="middle">9.75조원</text><line x1="88" y1="16.0" x2="704" y2="16.0" class="grid-line" /><text x="80" y="16.0" class="axis-label" text-anchor="end" dominant-baseline="middle">13.12조원</text><line x1="88" y1="296.3" x2="704" y2="296.3" class="baseline" /><path d="M117.6,296.29478991933223 L137.6,296.29478991933223 L137.6,296.29478991933223 Q137.6,298.75050840593406 135.14428151339817,298.75050840593406 L120.05571848660182,298.75050840593406 Q117.6,298.75050840593406 117.6,296.29478991933223 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2025 Q2 매출액: -1,149.6억원</title></path><path d="M139.6,296.29478991933223 L159.6,296.29478991933223 L159.6,297.1893508640694 Q159.6,301.1893508640694 155.6,301.1893508640694 L143.6,301.1893508640694 Q139.6,301.1893508640694 139.6,297.1893508640694 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2025 Q2 영업이익: -2,291.2억원</title></path><path d="M161.6,296.29478991933223 L181.6,296.29478991933223 L181.6,298.24044973073046 Q181.6,302.24044973073046 177.6,302.24044973073046 L165.6,302.24044973073046 Q161.6,302.24044973073046 161.6,298.24044973073046 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2025 Q2 순이익: -2,783.3억원</title></path><text x="149.6" y="324" class="axis-label" text-anchor="middle">2025 Q2</text><path d="M240.79999999999998,296.29478991933223 L260.79999999999995,296.29478991933223 L260.79999999999995,300.0 Q260.79999999999995,304.0 256.79999999999995,304.0 L244.79999999999998,304.0 Q240.79999999999998,304.0 240.79999999999998,300.0 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2025 Q3 매출액: -3,607.0억원</title></path><path d="M262.79999999999995,296.29478991933223 L282.79999999999995,296.29478991933223 L282.79999999999995,298.48598526388633 Q282.79999999999995,302.48598526388633 278.79999999999995,302.48598526388633 L266.79999999999995,302.48598526388633 Q262.79999999999995,302.48598526388633 262.79999999999995,298.48598526388633 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2025 Q3 영업이익: -2,898.2억원</title></path><path d="M284.79999999999995,296.29478991933223 L304.79999999999995,296.29478991933223 L304.79999999999995,297.6348352914605 Q304.79999999999995,301.6348352914605 300.79999999999995,301.6348352914605 L288.79999999999995,301.6348352914605 Q284.79999999999995,301.6348352914605 284.79999999999995,297.6348352914605 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2025 Q3 순이익: -2,499.8억원</title></path><text x="272.8" y="324" class="axis-label" text-anchor="middle">2025 Q3</text><path d="M364.0,296.29478991933223 L364.0,20.0 Q364.0,16.0 368.0,16.0 L380.0,16.0 Q384.0,16.0 384.0,20.0 L384.0,296.29478991933223 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2025 Q4 매출액: 13.12조원</title></path><path d="M386.0,296.29478991933223 L386.0,278.40344077535383 Q386.0,274.40344077535383 390.0,274.40344077535383 L402.0,274.40344077535383 Q406.0,274.40344077535383 406.0,278.40344077535383 L406.0,296.29478991933223 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2025 Q4 영업이익: 1.02조원</title></path><path d="M408.0,296.29478991933223 L408.0,288.72050464902986 Q408.0,284.72050464902986 412.0,284.72050464902986 L424.0,284.72050464902986 Q428.0,284.72050464902986 428.0,288.72050464902986 L428.0,296.29478991933223 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2025 Q4 순이익: 5,418.1억원</title></path><text x="396.0" y="324" class="axis-label" text-anchor="middle">2025 Q4</text><path d="M487.20000000000005,296.29478991933223 L487.20000000000005,206.465951507379 Q487.20000000000005,202.465951507379 491.20000000000005,202.465951507379 L503.20000000000005,202.465951507379 Q507.20000000000005,202.465951507379 507.20000000000005,206.465951507379 L507.20000000000005,296.29478991933223 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2026 Q1 매출액: 4.39조원</title></path><path d="M509.20000000000005,296.29478991933223 L509.20000000000005,288.8107379961719 Q509.20000000000005,284.8107379961719 513.2,284.8107379961719 L525.2,284.8107379961719 Q529.2,284.8107379961719 529.2,288.8107379961719 L529.2,296.29478991933223 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2026 Q1 영업이익: 5,375.9억원</title></path><path d="M531.2,296.29478991933223 L531.2,293.53551327729997 Q531.2,289.53551327729997 535.2,289.53551327729997 L547.2,289.53551327729997 Q551.2,289.53551327729997 551.2,293.53551327729997 L551.2,296.29478991933223 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2026 Q1 순이익: 3,164.2억원</title></path><text x="519.2" y="324" class="axis-label" text-anchor="middle">2026 Q1</text><path d="M610.4,296.29478991933223 L630.4,296.29478991933223 L630.4,296.29478991933223 Q630.4,297.00518526952357 629.6896046498086,297.00518526952357 L611.1103953501913,297.00518526952357 Q610.4,297.00518526952357 610.4,296.29478991933223 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2026 Q2 매출액: -332.6억원</title></path><path d="M632.4,296.29478991933223 L632.4,296.29478991933223 Q632.4,295.6869965498046 633.0077933695277,295.6869965498046 L651.7922066304723,295.6869965498046 Q652.4,295.6869965498046 652.4,296.29478991933223 L652.4,296.29478991933223 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2026 Q2 영업이익: 284.5억원</title></path><path d="M654.4,296.29478991933223 L654.4,296.29478991933223 Q654.4,293.0997732135327 657.5950167057995,293.0997732135327 L671.2049832942005,293.0997732135327 Q674.4,293.0997732135327 674.4,296.29478991933223 L674.4,296.29478991933223 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2026 Q2 순이익: 1,495.7억원</title></path><text x="642.4" y="324" class="axis-label" text-anchor="middle">2026 Q2</text></svg>
+      <table class="fin-table">
+        <thead>
+          <tr>
+            <th>분기</th><th>매출액</th><th>전분기비</th><th>영업이익</th><th>영업이익률</th>
+            <th>순이익</th><th>순이익률</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td>2026 Q2</td>
+            <td>-332.6억원</td>
+            <td>-100.8%</td>
+            <td>284.5억원</td>
+            <td>-85.6%</td>
+            <td>1,495.7억원</td>
+            <td>-449.8%</td>
+          </tr>
+          
+          <tr>
+            <td>2026 Q1</td>
+            <td>4.39조원</td>
+            <td>-66.5%</td>
+            <td>5,375.9억원</td>
+            <td>12.2%</td>
+            <td>3,164.2억원</td>
+            <td>7.2%</td>
+          </tr>
+          
+          <tr>
+            <td>2025 Q4</td>
+            <td>13.12조원</td>
+            <td>3,737.7%</td>
+            <td>1.02조원</td>
+            <td>7.8%</td>
+            <td>5,418.1억원</td>
+            <td>4.1%</td>
+          </tr>
+          
+          <tr>
+            <td>2025 Q3</td>
+            <td>-3,607.0억원</td>
+            <td>-213.8%</td>
+            <td>-2,898.2억원</td>
+            <td>80.4%</td>
+            <td>-2,499.8억원</td>
+            <td>69.3%</td>
+          </tr>
+          
+          <tr>
+            <td>2025 Q2</td>
+            <td>-1,149.6억원</td>
+            <td>미확인</td>
+            <td>-2,291.2억원</td>
+            <td>199.3%</td>
+            <td>-2,783.3억원</td>
+            <td>242.1%</td>
+          </tr>
+          
+        </tbody>
+      </table>
+      <p class="note">"전분기비"는 전년 동기가 아닌 직전 분기 대비 증감률입니다(계절성이 있는 업종은 전년 동기와 다를 수 있음에 유의).</p>
+      <p class="note">한국 기업은 분기·반기·사업보고서의 누적 수치를 차감해, 미국 기업은 연간(10-K) 수치에서 1~3분기(10-Q) 합계를 뺀 값으로 4분기를 역산해 단독 분기 실적을 산출합니다. 계산에 필요한 원자료 중 하나라도 확인되지 않으면 해당 분기는 표에서 제외했습니다(추정 없음). 이 방식 특성상 일회성 손익이나 정정공시가 있으면 특정 분기의 수치가 유달리 크거나 작게 나타날 수 있으니, 크게 튀는 값은 원문 공시와 대조해 보시길 권장합니다.</p>
+    </div>
+  </section>
+  
+
+  <section>
+    <h2>주주환원정책 <span class="badge ai">AI 해석</span></h2>
+    <div class="card"><p>제공된 공시 데이터를 바탕으로 한 SK텔레콤의 주주환원정책 추세 해석은 다음과 같습니다.</p>
+<ul>
+    <li><strong>2021년:</strong> 당기순이익 2.42조원, 주당배당금 3,295원</li>
+    <li><strong>2022년:</strong> 당기순이익 9,478.3억원, 주당배당금 3,320원</li>
+    <li><strong>2023년:</strong> 당기순이익 1.15조원, 주당배당금 3,540원</li>
+    <li><strong>2024년:</strong> 당기순이익 1.39조원, 주당배당금 3,540원</li>
+    <li><strong>2025년:</strong> 당기순이익 3,750.8억원, 주당배당금 1,660원</li>
+    <li><strong>배당 성향의 추세 및 안정성:</strong> 주당배당금은 2021년 3,295원에서 2022년 3,320원, 2023~2024년 3,540원으로 증가 또는 유지되는 흐름을 보였으나, 2025년에는 1,660원으로 감소하였습니다. 당기순이익 역시 변동성을 보이며 2025년에 3,750.8억원으로 감소함에 따라 배당 안정성 측면에서 변동이 확인됩니다.</li>
+    <li><strong>자사주 매입:</strong> 자사주 매입 상세 내역은 공시 데이터에서 확인되지 않음.</li>
+</ul></div>
+  </section>
+
+  <section>
+    <h2>산업 전망 (1년 · 5년 · 10년) <span class="badge ai">AI 해석</span></h2>
+    <div class="card"><p><strong>1년 시계열 전망</strong></p>
+<ul>
+    <li><strong>예상되는 주요 흐름/변화 요인:</strong> 단기적으로는 AI 데이터센터(AIDC) 설비용량이 확대되고 이익 성장률이 확대될 것으로 예상된다. 아울러 2분기 실적 개선과 지난해 해킹 사고에 따른 기저효과가 이어질 수 있다 <a href="https://www.pinpointnews.co.kr/news/articleView.html?idxno=471355" target="_blank" rel="noopener noreferrer">[출처]</a>. AIDC 설비용량은 올해 137MW에서 2027년 187MW로 늘어날 것으로 전망된다 <a href="https://www.newsworks.co.kr/news/articleView.html?idxno=851830" target="_blank" rel="noopener noreferrer">[출처]</a>. 또한 SK텔레콤의 2분기 AIDC 매출이 증가하는 등 단기 모멘텀이 이어질 수 있다 <a href="https://sateconomy.co.kr/news/view/1065591531168225" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+    <li><strong>이 회사에 미칠 영향(기회/위협):</strong> 기존 통신사업의 비용 효율화를 통한 수익성 개선과 데이터센터의 이익 성장 동력이 동시에 나타날 수 있는 기회가 존재한다 <a href="https://www.newsworks.co.kr/news/articleView.html?idxno=851830" target="_blank" rel="noopener noreferrer">[출처]</a>. 다만 투자 규모와 자본구조에 대한 관리가 필요할 수 있다 <a href="https://sateconomy.co.kr/news/view/1065591531168225" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+</ul>
+
+<p><strong>5년 시계열 전망</strong></p>
+<ul>
+    <li><strong>예상되는 주요 흐름/변화 요인:</strong> 5년 시계열에서는 AI 인프라 확장이 본격화되면서 SK텔레콤이 1기가와트(GW) 규모의 AI 데이터센터를 구축하는 등의 행보가 가시화될 수 있다 <a href="https://www.businesspost.co.kr/BP?command=article_view&num=446718" target="_blank" rel="noopener noreferrer">[출처]</a>. 또한 30조 원 규모의 AI 네트워크 시장을 정조준하며 아태 지역 성장을 주도할 가능성이 제기된다 <a href="https://www.mydaily.co.kr/page/view/2026091712253602843" target="_blank" rel="noopener noreferrer">[출처]</a>. 다만 멀어지는 시계열 특성상 대규모 투자가 수반되는 GW급 프로젝트의 자본구조 및 회수 가능성 등에 대한 불확실성이 존재한다.</li>
+    <li><strong>이 회사에 미칠 영향(기회/위협):</strong> 통신사는 망 운영비를 줄이는 동시에 저지연·고보안 연결과 엣지 AI, 네트워크 슬라이싱 등 새로운 수익원을 확보할 수 있는 기회가 있다 <a href="https://www.mydaily.co.kr/page/view/2026091712253602843" target="_blank" rel="noopener noreferrer">[출처]</a>. 반면 대규모 자본 투자가 요구되는 프로젝트 추진 과정에서 재무적 부담이나 자본규율 유지의 과제가 위협 요인으로 작용할 수 있다 <a href="https://sateconomy.co.kr/news/view/1065591531168225" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+</ul>
+
+<p><strong>10년 시계열 전망</strong></p>
+<ul>
+    <li><strong>예상되는 주요 흐름/변화 요인:</strong> 장기적으로는 2030년까지 계획된 대규모 출자 및 투자가 마무리 단계에 접어들며, 'SK하이퍼' 등에 대한 출자 계획(2030년까지 7500억원 등)과 연계된 성과가 판가름날 수 있다 <a href="https://www.goodkyung.com/news/articleView.html?idxno=290213" target="_blank" rel="noopener noreferrer">[출처]</a>. 또한 2030년 국내 AI 데이터센터 규모가 크게 확대될 경우 아태 지역에서 차지하는 비중과 연동되어 장기적인 위상이 결정될 것으로 보인다 <a href="https://www.edaily.co.kr/news/newspath.asp?newsid=05602246645544696" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+    <li><strong>이 회사에 미칠 영향(기회/위협):</strong> 아태 지역 기술시장 판도 변화 속에서 핵심 축으로 자리잡을 경우 기업 가치의 장기적 재평가를 기대할 수 있다 <a href="https://www.pinpointnews.co.kr/news/articleView.html?idxno=471355" target="_blank" rel="noopener noreferrer">[출처]</a>. 그러나 10년 뒤의 시계열은 거시경제 환경, 기술 패러다임 변화, 대규모 자본 지출에 따른 리스크 등으로 인해 예측의 불확실성이 매우 높다.</li>
+</ul>
+
+<p><strong>리스크 및 불확실성:</strong> 전망이 멀어질수록 산업 환경과 대규모 투자에 따른 불확실성이 커지며, GW급 AI 데이터센터 프로젝트는 기존 사업과 달라 투자 규모와 자본구조 측면에서 면밀한 관리가 요구된다 <a href="https://sateconomy.co.kr/news/view/1065591531168225" target="_blank" rel="noopener noreferrer">[출처]</a>. 또한 자금 배분 및 기업 분할 등에 따른 내부적 이해관계와 재무 여력 변화 역시 변수로 작용할 수 있다 <a href="https://www.businesspost.co.kr/BP?command=article_view&num=446898" target="_blank" rel="noopener noreferrer">[출처]</a>.</p></div>
+  </section>
+
+  <section>
+    <h2>데이터 출처</h2>
+    <div class="card">
+      <p><strong>공식 재무데이터</strong></p>
+      <ul class="source-list">
+        <li>DART 전자공시 사업보고서(reprt_code=11011), corp_code=00159023</li>
+        <li>DART 전자공시 분기·반기·사업보고서, corp_code=00159023</li>
+      </ul>
+      
+      <p><strong>검색 기반 참고자료</strong></p>
+      <ul class="source-list">
+        
+        <li><a href="https://www.newsinside.kr/news/articleView.html?idxno=5005035" target="_blank" rel="noopener noreferrer">SK하이닉스에 모인 SK &#39;베테랑&#39; 3인 부회장은 누구</a> · Sun, 20 Sep 2026 11:18:00 +0900</li>
+        
+        <li><a href="https://www.newsis.com/view/NISX20260911_0003786009" target="_blank" rel="noopener noreferrer">이통3사, &#39;아이폰18 프로&#39; 시리즈 12일부터 사전 판매 시작</a> · Fri, 11 Sep 2026 14:34:00 +0900</li>
+        
+        <li><a href="http://www.hansbiz.co.kr/news/articleView.html?idxno=865590" target="_blank" rel="noopener noreferrer">SK이노, WCE서 AI 데이터센터 전력 해법 제시</a> · Wed, 16 Sep 2026 08:42:00 +0900</li>
+        
+        <li><a href="https://www.venturesquare.net/1113828/" target="_blank" rel="noopener noreferrer">온톨로지 AI, 산업 현장으로…인포시즈, SK텔레콤 출신 박준 CBO 영입</a> · Tue, 15 Sep 2026 16:02:00 +0900</li>
+        
+        <li><a href="https://www.businesspost.co.kr/BP?command=article_view&amp;num=446718" target="_blank" rel="noopener noreferrer">[Who Is ?] 곽노정 SK하이닉스 대표이사 사장</a> · Wed, 16 Sep 2026 07:00:00 +0900</li>
+        
+        <li><a href="https://bizhankook.com/articles/sk-vice-chairmen-move-to-hynix.html" target="_blank" rel="noopener noreferrer">SK 부회장 3명 한꺼번에 하이닉스로…그룹 무게중심 완전히 옮겨갔나</a> · Fri, 18 Sep 2026 11:40:00 +0900</li>
+        
+        <li><a href="https://it.chosun.com/news/articleView.html?idxno=2023092170260" target="_blank" rel="noopener noreferrer">거실 난방부터 AI DC까지…삼성·SK·LG &#39;기후테크&#39; 격돌</a> · Wed, 16 Sep 2026 14:00:00 +0900</li>
+        
+        <li><a href="https://news.dealsitetv.com/articles/176067" target="_blank" rel="noopener noreferrer">[재계 투데이] SK하이닉스, 2026년 임단협 타결​ 外</a> · Wed, 16 Sep 2026 15:34:00 +0900</li>
+        
+        <li><a href="https://www.namdonews.com/news/articleView.html?idxno=921506" target="_blank" rel="noopener noreferrer">[특징주] SK텔레콤, 데이터센터 확장 기대에 상승…목표가 25%↑</a> · Fri, 28 Aug 2026 09:36:00 +0900</li>
+        
+        <li><a href="http://www.thebigdata.co.kr/view.php?ud=202609090806297588d0a8833aad_23" target="_blank" rel="noopener noreferrer">KT, 통신 상장기업 브랜드평판 9월 빅데이터 1위...SK텔레콤·LGU+ 순</a> · Wed, 09 Sep 2026 08:28:00 +0900</li>
+        
+        <li><a href="https://www.wowtv.co.kr/NewsCenter/News/Read?articleId=A202609040443&amp;t=NNv" target="_blank" rel="noopener noreferrer">본주 보다 40% 비싸다...SK하이닉스 ADR의 비밀 [마켓딥다이브]</a> · Fri, 04 Sep 2026 14:31:00 +0900</li>
+        
+        <li><a href="http://www.inews24.com/view/1997648" target="_blank" rel="noopener noreferrer">&#39;초대어&#39; 美 앤트로픽 IPO 임박⋯SKT 주가 92% &#39;껑충&#39;</a> · Mon, 24 Aug 2026 15:04:00 +0900</li>
+        
+        <li><a href="http://www.newstomato.com/ReadNews.aspx?no=1314182&amp;inflow=N" target="_blank" rel="noopener noreferrer">SK하닉, ‘글로벌 기업’ 재탄생…그룹 부회장단 ‘전진배치’</a> · Fri, 18 Sep 2026 11:42:00 +0900</li>
+        
+        <li><a href="https://www.sedaily.com/article/20090099?ref=naver" target="_blank" rel="noopener noreferrer">라포랩스, SK스토아 인수 재추진…거래구조 바꿔 재신청</a> · Sat, 12 Sep 2026 10:01:00 +0900</li>
+        
+        <li><a href="https://www.fnnews.com/news/202609091017139139" target="_blank" rel="noopener noreferrer">&#34;SK텔레콤, 14만원 간다&#34;…지엔씨에너지, AI데이터센터 수주 1번 타자 [株...</a> · Wed, 09 Sep 2026 11:00:00 +0900</li>
+        
+        <li><a href="https://news.dealsitetv.com/articles/175837" target="_blank" rel="noopener noreferrer">[핀포인트] [한화손해보험] 캐롯 통합 1년…점유율 10% 목표 &#39;정중동&#39;</a> · Wed, 16 Sep 2026 09:02:00 +0900</li>
+        
+        <li><a href="https://www.koreaittimes.com/news/articleView.html?idxno=157307" target="_blank" rel="noopener noreferrer">SK그룹 무게중심 AI·반도체로…전문경영인 부회장 3명 SK하이닉스 합류</a> · Fri, 18 Sep 2026 10:48:00 +0900</li>
+        
+        <li><a href="https://www.straightnews.co.kr/news/articleView.html?idxno=311541" target="_blank" rel="noopener noreferrer">SK 부회장 3인 하이닉스行…250명 임원 면담, 조직·중장기 전략 점검</a> · Fri, 18 Sep 2026 13:18:00 +0900</li>
+        
+        <li><a href="http://www.seouleconews.com/news/articleView.html?idxno=93844" target="_blank" rel="noopener noreferrer">SK그룹, 하이닉스 지휘체계 다듬는다…부회장 3명 전진배치</a> · Fri, 18 Sep 2026 10:50:00 +0900</li>
+        
+        <li><a href="https://www.businesskorea.co.kr/news/articleView.html?idxno=277332" target="_blank" rel="noopener noreferrer">SK그룹 전문경영인 부회장단 3인, SK하이닉스로 전격 이동</a> · Fri, 18 Sep 2026 17:28:00 +0900</li>
+        
+      </ul>
+      
+    </div>
+  </section>
+
+  <footer>
+    Generated by 종목분석 Agent · 2026-09-20 04:07
+  </footer>
+</div>
+
+<script>
+  (function () {
+    var saved = localStorage.getItem('stockagent-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  })();
+  function toggleTheme() {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('stockagent-theme', next);
+  }
+</script>
+</body>
+</html>
