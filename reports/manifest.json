@@ -1,5 +1,12 @@
 [
   {
+    "ticker": "005930",
+    "name": "삼성전자",
+    "market": "KR",
+    "date": "2026-09-20",
+    "filename": "timing_test.html"
+  },
+  {
     "ticker": "011790",
     "name": "SKC",
     "market": "KR",
