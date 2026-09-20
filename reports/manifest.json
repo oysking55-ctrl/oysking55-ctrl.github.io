@@ -1,5 +1,12 @@
 [
   {
+    "ticker": "402340",
+    "name": "SK스퀘어",
+    "market": "KR",
+    "date": "2026-09-20",
+    "filename": "402340_2026-09-20.html"
+  },
+  {
     "ticker": "005930",
     "name": "삼성전자",
     "market": "KR",
