@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KT CORP(KT) 종목분석 리포트</title>
+<style>
+  :root {
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --grid-line:      #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6;
+    --series-2:       #eb6834;
+    --series-3:       #1baf7a;
+    --series-4:       #eda100;
+    --status-good:    #0ca30c;
+    --status-warning: #fab219;
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --grid-line:      #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --series-1:       #3987e5;
+    --series-2:       #d95926;
+    --series-3:       #199e70;
+    --series-4:       #c98500;
+    --status-good:    #0ca30c;
+    --status-warning: #fab219;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --grid-line:      #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --series-1:       #3987e5;
+      --series-2:       #d95926;
+      --series-3:       #199e70;
+      --series-4:       #c98500;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page-plane);
+    color: var(--text-primary);
+    line-height: 1.6;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 24px 20px 64px; }
+  header.report-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 16px; margin-bottom: 8px; flex-wrap: wrap;
+  }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  .subtitle { color: var(--text-secondary); font-size: 14px; margin: 0; }
+  .meta { color: var(--text-muted); font-size: 13px; margin-top: 6px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+  .chip-btn {
+    background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 12px; font-size: 13px; cursor: pointer;
+    text-decoration: none; display: inline-block; white-space: nowrap;
+  }
+  .chip-btn:hover { border-color: var(--series-1); }
+  .disclaimer {
+    background: var(--surface-1); border: 1px solid var(--border); border-left: 4px solid var(--status-warning);
+    border-radius: 6px; padding: 12px 16px; font-size: 13px; color: var(--text-secondary); margin: 16px 0 28px;
+  }
+  section { margin: 32px 0; }
+  h2 {
+    font-size: 18px; border-bottom: 1px solid var(--grid-line); padding-bottom: 8px; margin-bottom: 14px;
+  }
+  .badge {
+    display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+    margin-left: 8px; vertical-align: middle;
+  }
+  .badge.fact { background: rgba(42,120,214,0.14); color: var(--series-1); }
+  .badge.ai { background: rgba(235,104,52,0.14); color: var(--series-2); }
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px;
+  }
+  .card p:first-child { margin-top: 0; }
+  .card p:last-child { margin-bottom: 0; }
+  .card a { color: var(--series-1); }
+  table.fin-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 14px; }
+  table.fin-table th, table.fin-table td {
+    text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--grid-line);
+    font-variant-numeric: tabular-nums;
+  }
+  table.fin-table th:first-child, table.fin-table td:first-child { text-align: left; }
+  table.fin-table th { color: var(--text-secondary); font-weight: 600; font-size: 12px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 10px 0 4px; font-size: 12px; color: var(--text-secondary); }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .fin-chart .grid-line { stroke: var(--grid-line); stroke-width: 1; }
+  .fin-chart .baseline { stroke: var(--baseline); stroke-width: 1; }
+  .fin-chart .axis-label { fill: var(--text-muted); font-size: 10px; }
+  .fin-chart .bar { transition: opacity .15s; }
+  .fin-chart .bar:hover { opacity: 0.75; }
+  .chart-empty { color: var(--text-muted); font-size: 13px; }
+  .kpi-row { display: flex; gap: 24px; margin: 10px 0 4px; flex-wrap: wrap; }
+  .kpi { font-size: 13px; color: var(--text-secondary); }
+  .kpi b { display: block; font-size: 18px; color: var(--text-primary); font-weight: 600; }
+  .note { font-size: 12px; color: var(--text-muted); margin-top: 10px; }
+  ul.source-list { font-size: 13px; color: var(--text-secondary); padding-left: 18px; }
+  ul.source-list a { color: var(--series-1); }
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--grid-line); font-size: 12px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="report-header">
+    <div>
+      <h1>KT CORP <span class="subtitle">(US · KT)</span></h1>
+      <p class="subtitle">Telephone Communications (No Radiotelephone)</p>
+      <p class="meta">리포트 생성: 2026-09-20 04:11 · 재무 데이터 기준일: 2026-09-20</p>
+    </div>
+    <div class="header-actions">
+      <a class="chip-btn" href="./index.html">전체 리포트 목록</a>
+      <button id="theme-toggle" class="chip-btn" type="button" onclick="toggleTheme()">라이트/다크 전환</button>
+    </div>
+  </header>
+
+  <div class="disclaimer">
+    본 리포트는 AI가 생성한 콘텐츠입니다. <span class="badge fact">공식데이터</span> 배지가 붙은 수치는
+    DART/SEC 공시 원문을 코드로 그대로 파싱한 값이며, <span class="badge ai">AI 해석</span> 배지가 붙은
+    서술은 검색 자료를 근거로 AI가 작성한 해석/전망입니다. 투자 판단과 그 결과에 대한 책임은 전적으로
+    이용자 본인에게 있으며, 본 리포트는 투자 권유가 아닙니다.
+  </div>
+
+  <section>
+    <h2>사업 분야 · 경쟁현황 · 경쟁력 <span class="badge ai">AI 해석</span></h2>
+    <div class="card"><p>KT(KT Corp.)의 사업 부문, 경쟁현황, 경쟁력에 대한 분석 내용은 다음과 같다.</p>
+<ul>
+  <li><strong>주요 사업 부문 및 제품·서비스 구성:</strong> KT는 무선사업, 미디어 사업(올레tv 모바일 및 시즌(Seezn) 등 OTT 서비스)을 비롯하여 <a href="http://www.ftoday.co.kr/news/articleView.html?idxno=113247" target="_blank" rel="noopener noreferrer">[출처]</a>, AI 중심의 미래 도시 발전 방향과 관련된 AI 시티 사업 <a href="http://www.breaknews.com/1235530" target="_blank" rel="noopener noreferrer">[출처]</a>, AI 학습 및 자율주행 방역 로봇 등의 제품 및 서비스 영역으로 사업을 확장하고 있다 <a href="https://premium.mk.co.kr/view.php?no=31706" target="_blank" rel="noopener noreferrer">[출처]</a>. 또한 국방광대역 통합망 장비 구축 등 공공 및 통신 인프라 관련 사업도 영위하고 있다 <a href="http://www.the-stock.kr/news/articleView.html?idxno=18668" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+  <li><strong>속한 산업 내 경쟁현황:</strong> 국내 무선 통신 및 유료방송 시장 등에서 SK텔레콤(SK브로드밴드), LG유플러스 등의 경쟁사와 경쟁하고 있다 <a href="http://www.ftoday.co.kr/news/articleView.html?idxno=113247" target="_blank" rel="noopener noreferrer">[출처]</a> <a href="http://www.thebell.co.kr/front/free/contents/news/article_view.asp?key=202008070849005900102332" target="_blank" rel="noopener noreferrer">[출처]</a>. 유료방송 시장에서는 자회사(KT스카이라이프 등)를 통한 인수합병 등을 통해 시장 점유율을 확대하는 양상을 보였으며, 과거 기준 IPTV 가입자 순증 부문 등에서 성과를 기록한 바 있다 <a href="http://www.thebell.co.kr/front/free/contents/news/article_view.asp?key=202007230651123180105236" target="_blank" rel="noopener noreferrer">[출처]</a> <a href="http://www.edaily.co.kr/news/newspath.asp?newsid=01498966625668552" target="_blank" rel="noopener noreferrer">[출처]</a>. 다만, 구체적인 현행 시장점유율 수치는 제공된 자료를 통해 확인할 수 없다.</li>
+  <li><strong>경쟁력(강점)과 약점/리스크 요인:</strong> 
+    <ul>
+      <li><strong>강점:</strong> 주주환원 정책이 경쟁사나 주요 대기업의 정책보다 앞서간다는 평가를 받는 등 주주가치 제고 측면에서 긍정적 평가를 받은 이력이 있다 <a href="http://www.techholic.co.kr/news/articleView.html?idxno=202884" target="_blank" rel="noopener noreferrer">[출처]</a>. 또한 AI 로봇, AI 시티 등 신사업 분야에서 민간 참여자로 활동하며 기술 적용을 시도하고 있다 <a href="http://www.breaknews.com/1235530" target="_blank" rel="noopener noreferrer">[출처]</a> <a href="https://premium.mk.co.kr/view.php?no=31706" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+      <li><strong>약점/리스크 요인:</strong> 과거 OTT 서비스(시즌 등) 출시 과정에서 경쟁사 대비 다소 늦은 출발을 보인 바 있으며 <a href="http://www.ftoday.co.kr/news/articleView.html?idxno=113247" target="_blank" rel="noopener noreferrer">[출처]</a>, 그 외의 구체적인 재무적 리스크나 약점에 대해서는 제공된 자료로는 확인되지 않음 <a href="http://www.ftoday.co.kr/news/articleView.html?idxno=113247" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+    </ul>
+  </li>
+</ul></div>
+  </section>
+
+  <section>
+    <h2>최근 0개년 경영현황 <span class="badge fact">공식데이터</span></h2>
+    <div class="card">
+      <div class="kpi-row">
+        <div class="kpi">매출 CAGR<b>미확인</b></div>
+        <div class="kpi">순이익 CAGR<b>미확인</b></div>
+        
+        <div class="kpi">현재가(비공식 참고)<b>$19.38</b></div>
+        
+      </div>
+      <div class="legend">
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-1)"></span>매출액</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-2)"></span>영업이익</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-3)"></span>순이익</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-4)"></span>EBITDA</span>
+        
+      </div>
+      <p class="chart-empty">차트를 그릴 재무 데이터가 없습니다.</p>
+      <table class="fin-table">
+        <thead>
+          <tr>
+            <th>연도</th><th>매출액</th><th>YoY</th><th>영업이익</th><th>영업이익률</th>
+            <th>순이익</th><th>순이익률</th><th>EBITDA</th><th>주당배당금</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+        </tbody>
+      </table>
+      
+      <p class="note">EBITDA는 영업이익 + 감가상각비/무형자산상각비로 산출했으며, 공시에서 상각비를 특정할 수 없는 연도는 "미확인"으로 표기했습니다(임의 추정 없음).</p>
+      
+      <p class="note">현재가/시가총액은 비공식 참고용 시세(yfinance)이며 공식 공시 데이터가 아닙니다.</p>
+      
+    </div>
+  </section>
+
+  
+
+  <section>
+    <h2>주주환원정책 <span class="badge ai">AI 해석</span></h2>
+    <div class="card"><p><strong>주주환원정책 추세 해석:</strong></p>
+<ul>
+  <li>제공된 데이터가 없어 주당배당금 및 순이익 추이를 확인할 수 없음.</li>
+  <li>배당 성향의 증가, 유지, 감소 등 구체적인 추세와 안정성은 공시 데이터에서 확인되지 않음.</li>
+  <li>자사주 매입 상세 등 추가적인 주주환원정책 관련 수치는 공시 데이터에서 확인되지 않음.</li>
+</ul></div>
+  </section>
+
+  <section>
+    <h2>산업 전망 (1년 · 5년 · 10년) <span class="badge ai">AI 해석</span></h2>
+    <div class="card"><p><strong>1년 시계열 전망</strong></p>
+<ul>
+<li><strong>주요 흐름 및 변화 요인:</strong> 통신 산업 내에서 인공지능(AI)을 접목한 사업 전환과 데이터센터 사업 확대 움직임이 나타나고 있으며, KT는 향후 5년간 18조 원을 투자해 AI 플랫폼 기업으로 전환하고 데이터센터 사업을 확대하겠다는 중장기 계획을 가지고 있다 <a href="https://www.ekn.kr/web/view.php?key=20260728026156830" target="_blank" rel="noopener noreferrer">[출처]</a>. 또한 아이폰 자급제 관련 혜택이나 납품대금 연동제 가입 등 부가적인 영업 및 상생 활동도 병행될 수 있다 <a href="https://biz.newdaily.co.kr/site/data/html/20260728026156830" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+<li><strong>KT에 미칠 영향(기회/위협):</strong> AI 플랫폼 전환 및 데이터센터 사업 확대 추진은 장기적 성장 동력이 될 수 있으나, 시장에서는 KT의 이러한 전략적 변화에 대해 관망세를 보이는 측면도 존재한다 <a href="https://www.ekn.kr/web/view.php?key=20260728026156830" target="_blank" rel="noopener noreferrer">[출처]</a>. 단기적으로는 투자 집행에 따른 비용 부담과 시장 반응을 주시해야 하는 국면이다.</li>
+</ul>
+
+<p><strong>5년 시계열 전망</strong></p>
+<ul>
+<li><strong>주요 흐름 및 변화 요인:</strong> KT가 제시한 향후 5년간 18조 원 규모의 투자가 본격적으로 진행되는 시기이다 <a href="https://www.ekn.kr/web/view.php?key=20260728026156830" target="_blank" rel="noopener noreferrer">[출처]</a>. AI 플랫폼 기업으로의 체질 개선과 데이터센터 사업 확장이 가시적인 성과를 내는지가 관건이 될 수 있다 <a href="https://www.ekn.kr/web/view.php?key=20260728026156830" target="_blank" rel="noopener noreferrer">[출처]</a>. 다만 이 시기의 전망은 거시경제 환경이나 경쟁사의 AI 데이터센터 신설 법인 설립, 외부 투자 유치, 앵커 테넌트 확보 등의 시장 변화에 영향을 받을 수 있다 <a href="https://www.ekn.kr/web/view.php?key=20260728026156830" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+<li><strong>KT에 미칠 영향(기회/위협):</strong> AI 플랫폼과 데이터센터 중심의 사업 포트폴리오 재편이 성공할 경우 기업 가치 제고의 기회가 될 수 있으나, 대규모 투자 대비 수익성 확보가 지연될 경우 재무적 부담이나 경쟁사 대비 관망세 지속 등의 위협 요인에 직면할 수 있다.</li>
+</ul>
+
+<p><strong>10년 시계열 전망</strong></p>
+<ul>
+<li><strong>주요 흐름 및 변화 요인:</strong> 제공된 자료로는 10년 후의 구체적인 산업 흐름을 단정하기 어렵다. 다만 앞선 5개년의 AI 플랫폼 및 데이터센터 투자 결과가 장기적인 디지털 인프라 시장에서 어떤 위치를 차지하게 될지가 판가름 나는 시기가 될 수 있다 <a href="https://www.ekn.kr/web/view.php?key=20260728026156830" target="_blank" rel="noopener noreferrer">[출처]</a>. 이사 선임 기준이나 거버넌스 변화 등의 요인도 장기 경영 방향성에 영향을 줄 수 있다 <a href="http://www.sisaweek.com/news/articleView.html?idxno=205214" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+<li><strong>KT에 미칠 영향(기회/위협):</strong> 장기 시계열일수록 산업 환경의 불확실성이 매우 크며, 제공된 자료만으로는 구체적인 기회와 위협 요인을 상세히 특정하기 어렵다. 통신 및 AI 기술 패러다임 변화에 따라 사업 지속 가능성이 좌우될 수 있다.</li>
+</ul>
+
+<p><strong>리스크 및 불확실성:</strong> 전망이 멀수록(특히 5년 및 10년 시계열) 거시경제 변동, 기술 환경 변화, 경쟁 구도의 심화 등으로 인해 불확실성이 현저히 커진다. KT의 18조 원 규모 투자 및 AI 플랫폼·데이터센터 전환 전략이 계획대로 성과를 거둘지 여부와 시장의 관망세 해소 여부는 전적으로 보장되지 않으며, 외부 투자 유치 및 앵커 테넌트 확보 등의 실행 과정에서도 변동성이 존재한다 <a href="https://www.ekn.kr/web/view.php?key=20260728026156830" target="_blank" rel="noopener noreferrer">[출처]</a>. 그 외 구체적인 장기 리스크에 대해서는 제공된 자료로는 확인되지 않음.</p></div>
+  </section>
+
+  <section>
+    <h2>데이터 출처</h2>
+    <div class="card">
+      <p><strong>공식 재무데이터</strong></p>
+      <ul class="source-list">
+        <li>SEC EDGAR companyfacts API, CIK=0000892450</li>
+        
+      </ul>
+      
+      <p><strong>검색 기반 참고자료</strong></p>
+      <ul class="source-list">
+        
+        <li><a href="https://biz.newdaily.co.kr/site/data/html/2023/09/21/2023092100141.html" target="_blank" rel="noopener noreferrer">[데일리 IT 단신] KT, 그룹사-파트너사 합동 납품대금 연동제 가입 外</a> · Thu, 21 Sep 2023 11:38:00 +0900</li>
+        
+        <li><a href="http://www.fntimes.com/html/view.php?ud=202303072114432980645ffc9771_18" target="_blank" rel="noopener noreferrer">윤경림 KT 차기 대표이사 후보자는 누구?…현대차·CJ 거친 &#39;전략통&#39;</a> · Tue, 07 Mar 2023 21:22:00 +0900</li>
+        
+        <li><a href="http://www.efnews.co.kr/news/articleView.html?idxno=102038" target="_blank" rel="noopener noreferrer">KT 이사회, 차기 대표이사 최종 후보로 윤경림 사장 확정</a> · Wed, 08 Mar 2023 08:14:00 +0900</li>
+        
+        <li><a href="http://www.newsbrite.net/news/articleView.html?idxno=171350" target="_blank" rel="noopener noreferrer">KT 윤경림 후보자, 지배구조개선 시동</a> · Wed, 08 Mar 2023 10:54:00 +0900</li>
+        
+        <li><a href="http://www.breaknews.com/1235530" target="_blank" rel="noopener noreferrer">2026 월드 스마트시티 엑스포 부산서 개막…‘스마트시티 넘어 AI 시티로...</a> · Thu, 10 Sep 2026 08:10:00 +0900</li>
+        
+        <li><a href="http://www.the-stock.kr/news/articleView.html?idxno=18668" target="_blank" rel="noopener noreferrer">[기업뉴스 브리핑] 우리넷, KT와 차기 국방광대역 통합망 장비 구축 계약...</a> · Sat, 29 Jul 2023 03:58:00 +0900</li>
+        
+        <li><a href="https://premium.mk.co.kr/view.php?no=31706" target="_blank" rel="noopener noreferrer">KT adds self-moving disinfection robot, co-CEO Park resigns from nominati...</a> · Fri, 01 Apr 2022 06:02:00 +0900</li>
+        
+        <li><a href="http://www.techholic.co.kr/news/articleView.html?idxno=202884" target="_blank" rel="noopener noreferrer">구현모의 KT, 주주가치 제고 전략으로 투자자 &#39;기대감 상승&#39;</a> · Mon, 21 Mar 2022 08:46:00 +0900</li>
+        
+        <li><a href="http://www.ftoday.co.kr/news/articleView.html?idxno=113247" target="_blank" rel="noopener noreferrer">수장 유임하는 SKT·LGU+, 교체되는 KT</a> · Mon, 16 Dec 2019 09:18:00 +0900</li>
+        
+        <li><a href="http://www.investchosun.com/?p=3256623" target="_blank" rel="noopener noreferrer">[Invest]완성 향하는 SKT, 추격하는 KT…통신사 사업재편, 내년이 &#39;분수...</a> · Wed, 23 Dec 2020 07:11:00 +0900</li>
+        
+        <li><a href="http://www.thebell.co.kr/front/free/contents/news/article_view.asp?key=202007230651123180105236" target="_blank" rel="noopener noreferrer">[더벨][현대HCN 매각]전면 나선 KT스카이라이프…KT 역할은</a> · Mon, 27 Jul 2020 16:22:00 +0900</li>
+        
+        <li><a href="https://n.news.naver.com/mnews/article/044/0000051503?sid=108" target="_blank" rel="noopener noreferrer">[번역]KT Corp. CEO shuns return for second term 이용경 KT 사장 차기 후...</a> · Fri, 17 Jun 2005 10:02:00 +0900</li>
+        
+        <li><a href="http://www.thebell.co.kr/front/free/contents/news/article_view.asp?key=202008070849005900102332" target="_blank" rel="noopener noreferrer">[더벨]&#39;점유율 1등&#39; 멀어진 SKB, IPO 순번 뒤로 밀리나</a> · Mon, 10 Aug 2020 13:12:00 +0900</li>
+        
+        <li><a href="http://www.edaily.co.kr/news/newspath.asp?newsid=01498966625668552" target="_blank" rel="noopener noreferrer">지난해 IPTV 가입자 순증, KT &gt; SK브로드밴드&gt; LG유플러스 순</a> · Sat, 08 Feb 2020 11:37:00 +0900</li>
+        
+        <li><a href="https://www.ekn.kr/web/view.php?key=20260728026156830" target="_blank" rel="noopener noreferrer">AI가 갈라놓은 통신주 몸값…SKT는 프리미엄, KT는 관망</a> · Tue, 28 Jul 2026 13:48:00 +0900</li>
+        
+        <li><a href="http://www.sisaweek.com/news/articleView.html?idxno=205214" target="_blank" rel="noopener noreferrer">KT 대표이사 자격에 &#39;정보통신 전문성&#39; 제외되나</a> · Thu, 01 Jun 2023 13:26:00 +0900</li>
+        
+      </ul>
+      
+    </div>
+  </section>
+
+  <footer>
+    Generated by 종목분석 Agent · 2026-09-20 04:11
+  </footer>
+</div>
+
+<script>
+  (function () {
+    var saved = localStorage.getItem('stockagent-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  })();
+  function toggleTheme() {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('stockagent-theme', next);
+  }
+</script>
+</body>
+</html>

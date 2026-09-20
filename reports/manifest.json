@@ -1,5 +1,12 @@
 [
   {
+    "ticker": "KT",
+    "name": "KT CORP",
+    "market": "US",
+    "date": "2026-09-20",
+    "filename": "KT_2026-09-20.html"
+  },
+  {
     "ticker": "017670",
     "name": "SK텔레콤",
     "market": "KR",
