@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>삼성전자(005930) 종목분석 리포트</title>
+<style>
+  :root {
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --grid-line:      #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6;
+    --series-2:       #eb6834;
+    --series-3:       #1baf7a;
+    --series-4:       #eda100;
+    --status-good:    #0ca30c;
+    --status-warning: #fab219;
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --grid-line:      #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --series-1:       #3987e5;
+    --series-2:       #d95926;
+    --series-3:       #199e70;
+    --series-4:       #c98500;
+    --status-good:    #0ca30c;
+    --status-warning: #fab219;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --grid-line:      #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --series-1:       #3987e5;
+      --series-2:       #d95926;
+      --series-3:       #199e70;
+      --series-4:       #c98500;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page-plane);
+    color: var(--text-primary);
+    line-height: 1.6;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 24px 20px 64px; }
+  header.report-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 16px; margin-bottom: 8px; flex-wrap: wrap;
+  }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  .subtitle { color: var(--text-secondary); font-size: 14px; margin: 0; }
+  .meta { color: var(--text-muted); font-size: 13px; margin-top: 6px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+  .chip-btn {
+    background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 12px; font-size: 13px; cursor: pointer;
+    text-decoration: none; display: inline-block; white-space: nowrap;
+  }
+  .chip-btn:hover { border-color: var(--series-1); }
+  .disclaimer {
+    background: var(--surface-1); border: 1px solid var(--border); border-left: 4px solid var(--status-warning);
+    border-radius: 6px; padding: 12px 16px; font-size: 13px; color: var(--text-secondary); margin: 16px 0 28px;
+  }
+  section { margin: 32px 0; }
+  h2 {
+    font-size: 18px; border-bottom: 1px solid var(--grid-line); padding-bottom: 8px; margin-bottom: 14px;
+  }
+  .badge {
+    display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+    margin-left: 8px; vertical-align: middle;
+  }
+  .badge.fact { background: rgba(42,120,214,0.14); color: var(--series-1); }
+  .badge.ai { background: rgba(235,104,52,0.14); color: var(--series-2); }
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px;
+  }
+  .card p:first-child { margin-top: 0; }
+  .card p:last-child { margin-bottom: 0; }
+  .card a { color: var(--series-1); }
+  table.fin-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 14px; }
+  table.fin-table th, table.fin-table td {
+    text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--grid-line);
+    font-variant-numeric: tabular-nums;
+  }
+  table.fin-table th:first-child, table.fin-table td:first-child { text-align: left; }
+  table.fin-table th { color: var(--text-secondary); font-weight: 600; font-size: 12px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 10px 0 4px; font-size: 12px; color: var(--text-secondary); }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .fin-chart .grid-line { stroke: var(--grid-line); stroke-width: 1; }
+  .fin-chart .baseline { stroke: var(--baseline); stroke-width: 1; }
+  .fin-chart .axis-label { fill: var(--text-muted); font-size: 10px; }
+  .fin-chart .bar { transition: opacity .15s; }
+  .fin-chart .bar:hover { opacity: 0.75; }
+  .chart-empty { color: var(--text-muted); font-size: 13px; }
+  .kpi-row { display: flex; gap: 24px; margin: 10px 0 4px; flex-wrap: wrap; }
+  .kpi { font-size: 13px; color: var(--text-secondary); }
+  .kpi b { display: block; font-size: 18px; color: var(--text-primary); font-weight: 600; }
+  .note { font-size: 12px; color: var(--text-muted); margin-top: 10px; }
+  ul.source-list { font-size: 13px; color: var(--text-secondary); padding-left: 18px; }
+  ul.source-list a { color: var(--series-1); }
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--grid-line); font-size: 12px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="report-header">
+    <div>
+      <h1>삼성전자 <span class="subtitle">(KR · 005930)</span></h1>
+      <p class="subtitle">업종 정보 미확인</p>
+      <p class="meta">리포트 생성: 2026-09-20 13:47 · 재무 데이터 기준일: 2026-09-20</p>
+    </div>
+    <div class="header-actions">
+      <a class="chip-btn" href="./index.html">전체 리포트 목록</a>
+      <button id="theme-toggle" class="chip-btn" type="button" onclick="toggleTheme()">라이트/다크 전환</button>
+    </div>
+  </header>
+
+  <div class="disclaimer">
+    본 리포트는 AI가 생성한 콘텐츠입니다. <span class="badge fact">공식데이터</span> 배지가 붙은 수치는
+    DART/SEC 공시 원문을 코드로 그대로 파싱한 값이며, <span class="badge ai">AI 해석</span> 배지가 붙은
+    서술은 검색 자료를 근거로 AI가 작성한 해석/전망입니다. 투자 판단과 그 결과에 대한 책임은 전적으로
+    이용자 본인에게 있으며, 본 리포트는 투자 권유가 아닙니다.
+  </div>
+
+  <section>
+    <h2>사업 분야 · 경쟁현황 · 경쟁력 <span class="badge ai">AI 해석</span></h2>
+    <div class="card"><p>삼성전자의 사업 분야, 경쟁 현황, 경쟁력에 대한 분석 내용은 다음과 같습니다.</p>
+<ul>
+  <li>
+    <strong>1. 주요 사업 부문 및 제품·서비스 구성</strong>
+    <ul>
+      <li>삼성전자는 반도체 사업을 담당하는 DS(디바이스솔루션) 부문과 가전, 스마트폰 등을 담당하는 DX(디바이스경험/완제품) 부문 등으로 구성되어 있습니다 <a href="http://weekly.chosun.com/news/articleView.html?idxno=55446" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://www.edaily.co.kr/News/Read?newsId=01170966645582088&mediaCodeNo=257&utm_source=naver&utm_medium=referral&utm_campaign=news_syndication&utm_content=original_article" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+      <li>DS부문 산하의 LSI사업부는 핵심 모바일 반도체인 '엑시노스' 등을 설계하며, 파운드리는 이를 제조합니다 <a href="https://www.mk.co.kr/article/12156589" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+      <li>DX부문은 스마트폰(갤럭시 시리즈 등)과 영상디스플레이 등 완제품 및 관련 서비스를 제공합니다 <a href="http://weekly.chosun.com/news/articleView.html?idxno=55446" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://www.chosun.com/economy/tech_it/2026/09/17/7H73YLXEEJH6VPPMECAJYZTN74/?utm_source=naver&utm_medium=referral&utm_campaign=naver-news" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://www.joongang.co.kr/article/25463350" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+    </ul>
+  </li>
+  <li>
+    <strong>2. 산업 내 경쟁 현황</strong>
+    <ul>
+      <li>시장조사업체 카운터포인트리서치에 따르면, 삼성전자의 자체 모바일 AP '엑시노스'는 올해 2분기 글로벌 스마트폰 AP 시장에서 출하량 기준 9%의 점유율을 기록했습니다 <a href="https://www.newsis.com/view/NISX20260918_0003795691" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+      <li>스마트폰 및 폴더블폰 시장에서 애플 등이 경쟁사로 존재하며, 애플의 폴더블폰 시장 진출 등에 대응하여 삼성전자의 '갤럭시 Z 폴드8' 등이 판매되고 있습니다 <a href="https://www.chosun.com/economy/tech_it/2026/09/17/7H73YLXEEJK6VPPMECAJYZTN74/?utm_source=naver&utm_medium=referral&utm_campaign=naver-news" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+      <li>파운드리 및 시스템 반도체 영역에서는 TSMC 등이 주요 경쟁사로 언급되며, DB하이텍 등도 시장에 존재합니다 <a href="https://www.mk.co.kr/article/12157344" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+    </ul>
+  </li>
+  <li>
+    <strong>3. 경쟁력(강점)과 약점/리스크 요인</strong>
+    <ul>
+      <li><strong>강점:</strong> 갤럭시 스마트폰(예: 갤럭시 S26 등)의 판매 호조에 힘입어 자체 AP인 엑시노스의 2분기 출하량 점유율이 상승하는 등 모바일 반도체 설계 및 제조 역량이 실적으로 반영되고 있습니다 <a href="https://www.hankyung.com/article/202609183963g" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://www.kmib.co.kr/article/view.asp?arcid=9000013401&cp=nv" target="_blank" rel="noopener noreferrer">[출처]</a>. AP 경쟁력을 높임으로써 외부 칩 의존도를 낮추고 원가 부담을 줄일 수 있는 기반을 가지고 있습니다 <a href="https://www.mk.co.kr/article/12156589" target="_blank" rel="noopener noreferrer">[출처]</a>. 또한 폴더블폰(갤럭시 Z 폴드8) 등 하드웨어 경쟁력을 유지하고 있습니다 <a href="https://www.chosun.com/economy/tech_it/2026/09/17/7H73YLXEEJH6VPPMECAJYZTN74/?utm_source=naver&utm_medium=referral&utm_campaign=naver-news" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+      <li><strong>약점 및 리스크:</strong> 사내 조직 내에서 DS 부문과 DX 부문 간 사업 성과 및 보상 방식의 차이로 인해 보상 격차 불만이 존재하며, 이는 노동조합이 반도체(DS) 중심과 완제품(DX) 중심로 재편되는 등 내부 조직 관리 측면의 리스크 요인으로 작용하고 있습니다 <a href="http://weekly.chosun.com/news/articleView.html?idxno=55446" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://www.dnews.co.kr/uhtml/view.jsp?idxno=202609191638115540743" target="_blank" rel="noopener noreferrer">[출처]</a>. 기타 재무적 건전성이나 거시경제적 리스크 등은 제공된 자료로 확인되지 않음 <a href="http://weekly.chosun.com/news/articleView.html?idxno=55446" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+    </ul>
+  </li>
+</ul></div>
+  </section>
+
+  <section>
+    <h2>최근 5개년 경영현황 <span class="badge fact">공식데이터</span></h2>
+    <div class="card">
+      <div class="kpi-row">
+        <div class="kpi">매출 CAGR<b>4.5%</b></div>
+        <div class="kpi">순이익 CAGR<b>3.2%</b></div>
+        
+        <div class="kpi">현재가(비공식 참고)<b>261,000원</b></div>
+        
+      </div>
+      <div class="legend">
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-1)"></span>매출액</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-2)"></span>영업이익</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-3)"></span>순이익</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-4)"></span>EBITDA</span>
+        
+      </div>
+      <svg viewBox="0 0 720 340" width="100%" role="img" aria-label="삼성전자 5개년 재무 추이 차트" class="fin-chart"><line x1="88" y1="304.0" x2="704" y2="304.0" class="grid-line" /><text x="80" y="304.0" class="axis-label" text-anchor="end" dominant-baseline="middle">0원</text><line x1="88" y1="232.0" x2="704" y2="232.0" class="grid-line" /><text x="80" y="232.0" class="axis-label" text-anchor="end" dominant-baseline="middle">83.40조원</text><line x1="88" y1="160.0" x2="704" y2="160.0" class="grid-line" /><text x="80" y="160.0" class="axis-label" text-anchor="end" dominant-baseline="middle">166.80조원</text><line x1="88" y1="88.0" x2="704" y2="88.0" class="grid-line" /><text x="80" y="88.0" class="axis-label" text-anchor="end" dominant-baseline="middle">250.20조원</text><line x1="88" y1="16.0" x2="704" y2="16.0" class="grid-line" /><text x="80" y="16.0" class="axis-label" text-anchor="end" dominant-baseline="middle">333.61조원</text><line x1="88" y1="304.0" x2="704" y2="304.0" class="baseline" /><path d="M106.6,304.0 L106.6,66.6188585408213 Q106.6,62.6188585408213 110.6,62.6188585408213 L122.6,62.6188585408213 Q126.6,62.6188585408213 126.6,66.6188585408213 L126.6,304.0 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2021년 매출액: 279.60조원</title></path><path d="M128.6,304.0 L128.6,263.42480263645666 Q128.6,259.42480263645666 132.6,259.42480263645666 L144.6,259.42480263645666 Q148.6,259.42480263645666 148.6,263.42480263645666 L148.6,304.0 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2021년 영업이익: 51.63조원</title></path><path d="M150.6,304.0 L150.6,273.5481384147305 Q150.6,269.5481384147305 154.6,269.5481384147305 L166.6,269.5481384147305 Q170.6,269.5481384147305 170.6,273.5481384147305 L170.6,304.0 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2021년 순이익: 39.91조원</title></path><text x="149.6" y="324" class="axis-label" text-anchor="middle">2021</text><path d="M229.79999999999998,304.0 L229.79999999999998,47.0854845035762 Q229.79999999999998,43.0854845035762 233.79999999999998,43.0854845035762 L245.79999999999998,43.0854845035762 Q249.79999999999998,43.0854845035762 249.79999999999998,47.0854845035762 L249.79999999999998,304.0 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2022년 매출액: 302.23조원</title></path><path d="M251.79999999999998,304.0 L251.79999999999998,270.55321618405964 Q251.79999999999998,266.55321618405964 255.79999999999998,266.55321618405964 L267.79999999999995,266.55321618405964 Q271.79999999999995,266.55321618405964 271.79999999999995,270.55321618405964 L271.79999999999995,304.0 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2022년 영업이익: 43.38조원</title></path><path d="M273.79999999999995,304.0 L273.79999999999995,259.9541700243957 Q273.79999999999995,255.9541700243957 277.79999999999995,255.9541700243957 L289.79999999999995,255.9541700243957 Q293.79999999999995,255.9541700243957 293.79999999999995,259.9541700243957 L293.79999999999995,304.0 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2022년 순이익: 55.65조원</title></path><text x="272.8" y="324" class="axis-label" text-anchor="middle">2022</text><path d="M353.0,304.0 L353.0,84.4625452440238 Q353.0,80.4625452440238 357.0,80.4625452440238 L369.0,80.4625452440238 Q373.0,80.4625452440238 373.0,84.4625452440238 L373.0,304.0 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2023년 매출액: 258.94조원</title></path><path d="M375.0,304.0 L375.0,302.33076911238913 Q375.0,298.33076911238913 379.0,298.33076911238913 L391.0,298.33076911238913 Q395.0,298.33076911238913 395.0,302.33076911238913 L395.0,304.0 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2023년 영업이익: 6.57조원</title></path><path d="M397.0,304.0 L397.0,294.6300797079937 Q397.0,290.6300797079937 401.0,290.6300797079937 L413.0,290.6300797079937 Q417.0,290.6300797079937 417.0,294.6300797079937 L417.0,304.0 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2023년 순이익: 15.49조원</title></path><text x="396.0" y="324" class="axis-label" text-anchor="middle">2023</text><path d="M476.20000000000005,304.0 L476.20000000000005,48.259958850013035 Q476.20000000000005,44.259958850013035 480.20000000000005,44.259958850013035 L492.20000000000005,44.259958850013035 Q496.20000000000005,44.259958850013035 496.20000000000005,48.259958850013035 L496.20000000000005,304.0 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2024년 매출액: 300.87조원</title></path><path d="M498.20000000000005,304.0 L498.20000000000005,279.74787467961676 Q498.20000000000005,275.74787467961676 502.20000000000005,275.74787467961676 L514.2,275.74787467961676 Q518.2,275.74787467961676 518.2,279.74787467961676 L518.2,304.0 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2024년 영업이익: 32.73조원</title></path><path d="M520.2,304.0 L520.2,278.2583558689534 Q520.2,274.2583558689534 524.2,274.2583558689534 L536.2,274.2583558689534 Q540.2,274.2583558689534 540.2,278.2583558689534 L540.2,304.0 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2024년 순이익: 34.45조원</title></path><text x="519.2" y="324" class="axis-label" text-anchor="middle">2024</text><path d="M599.4,304.0 L599.4,20.0 Q599.4,16.0 603.4,16.0 L615.4,16.0 Q619.4,16.0 619.4,20.0 L619.4,304.0 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2025년 매출액: 333.61조원</title></path><path d="M621.4,304.0 L621.4,270.3594748844069 Q621.4,266.3594748844069 625.4,266.3594748844069 L637.4,266.3594748844069 Q641.4,266.3594748844069 641.4,270.3594748844069 L641.4,304.0 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2025년 영업이익: 43.60조원</title></path><path d="M643.4,304.0 L643.4,268.97323711306365 Q643.4,264.97323711306365 647.4,264.97323711306365 L659.4,264.97323711306365 Q663.4,264.97323711306365 663.4,268.97323711306365 L663.4,304.0 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2025년 순이익: 45.21조원</title></path><text x="642.4" y="324" class="axis-label" text-anchor="middle">2025</text></svg>
+      <table class="fin-table">
+        <thead>
+          <tr>
+            <th>연도</th><th>매출액</th><th>YoY</th><th>영업이익</th><th>영업이익률</th>
+            <th>순이익</th><th>순이익률</th><th>EBITDA</th><th>주당배당금</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td>2025</td>
+            <td>333.61조원</td>
+            <td>10.9%</td>
+            <td>43.60조원</td>
+            <td>13.1%</td>
+            <td>45.21조원</td>
+            <td>13.6%</td>
+            <td>미확인</td>
+            <td>1,668원</td>
+          </tr>
+          
+          <tr>
+            <td>2024</td>
+            <td>300.87조원</td>
+            <td>16.2%</td>
+            <td>32.73조원</td>
+            <td>10.9%</td>
+            <td>34.45조원</td>
+            <td>11.5%</td>
+            <td>미확인</td>
+            <td>1,446원</td>
+          </tr>
+          
+          <tr>
+            <td>2023</td>
+            <td>258.94조원</td>
+            <td>-14.3%</td>
+            <td>6.57조원</td>
+            <td>2.5%</td>
+            <td>15.49조원</td>
+            <td>6.0%</td>
+            <td>미확인</td>
+            <td>1,444원</td>
+          </tr>
+          
+          <tr>
+            <td>2022</td>
+            <td>302.23조원</td>
+            <td>8.1%</td>
+            <td>43.38조원</td>
+            <td>14.4%</td>
+            <td>55.65조원</td>
+            <td>18.4%</td>
+            <td>미확인</td>
+            <td>1,444원</td>
+          </tr>
+          
+          <tr>
+            <td>2021</td>
+            <td>279.60조원</td>
+            <td>미확인</td>
+            <td>51.63조원</td>
+            <td>18.5%</td>
+            <td>39.91조원</td>
+            <td>14.3%</td>
+            <td>미확인</td>
+            <td>1,444원</td>
+          </tr>
+          
+        </tbody>
+      </table>
+      
+      <p class="note">EBITDA는 영업이익 + 감가상각비/무형자산상각비로 산출했으며, 공시에서 상각비를 특정할 수 없는 연도는 "미확인"으로 표기했습니다(임의 추정 없음).</p>
+      
+      <p class="note">현재가/시가총액은 비공식 참고용 시세(yfinance)이며 공식 공시 데이터가 아닙니다.</p>
+      
+    </div>
+  </section>
+
+  
+  <section>
+    <h2>최근 5분기 경영현황 <span class="badge fact">공식데이터</span></h2>
+    <div class="card">
+      <div class="legend">
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-1)"></span>매출액</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-2)"></span>영업이익</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-3)"></span>순이익</span>
+        
+      </div>
+      <svg viewBox="0 0 720 340" width="100%" role="img" aria-label="삼성전자 5분기 재무 추이 차트" class="fin-chart"><line x1="88" y1="304.0" x2="704" y2="304.0" class="grid-line" /><text x="80" y="304.0" class="axis-label" text-anchor="end" dominant-baseline="middle">-4.57조원</text><line x1="88" y1="232.0" x2="704" y2="232.0" class="grid-line" /><text x="80" y="232.0" class="axis-label" text-anchor="end" dominant-baseline="middle">58.46조원</text><line x1="88" y1="160.0" x2="704" y2="160.0" class="grid-line" /><text x="80" y="160.0" class="axis-label" text-anchor="end" dominant-baseline="middle">121.49조원</text><line x1="88" y1="88.0" x2="704" y2="88.0" class="grid-line" /><text x="80" y="88.0" class="axis-label" text-anchor="end" dominant-baseline="middle">184.51조원</text><line x1="88" y1="16.0" x2="704" y2="16.0" class="grid-line" /><text x="80" y="16.0" class="axis-label" text-anchor="end" dominant-baseline="middle">247.54조원</text><line x1="88" y1="298.8" x2="704" y2="298.8" class="baseline" /><path d="M117.6,298.7748133885536 L137.6,298.7748133885536 L137.6,300.0 Q137.6,304.0 133.6,304.0 L121.6,304.0 Q117.6,304.0 117.6,300.0 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2025 Q2 매출액: -4.57조원</title></path><path d="M139.6,298.7748133885536 L159.6,298.7748133885536 L159.6,298.7748133885536 Q159.6,301.0699809478783 157.30483244067526,301.0699809478783 L141.89516755932473,301.0699809478783 Q139.6,301.0699809478783 139.6,298.7748133885536 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2025 Q2 영업이익: -2.01조원</title></path><path d="M161.6,298.7748133885536 L181.6,298.7748133885536 L181.6,298.7748133885536 Q181.6,302.32336702691055 178.05144636164303,302.32336702691055 L165.14855363835696,302.32336702691055 Q161.6,302.32336702691055 161.6,298.7748133885536 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2025 Q2 순이익: -3.11조원</title></path><text x="149.6" y="324" class="axis-label" text-anchor="middle">2025 Q2</text><path d="M240.79999999999998,298.7748133885536 L240.79999999999998,289.6433476088893 Q240.79999999999998,285.6433476088893 244.79999999999998,285.6433476088893 L256.79999999999995,285.6433476088893 Q260.79999999999995,285.6433476088893 260.79999999999995,289.6433476088893 L260.79999999999995,298.7748133885536 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2025 Q3 매출액: 11.50조원</title></path><path d="M262.79999999999995,298.7748133885536 L262.79999999999995,294.21882684894484 Q262.79999999999995,290.21882684894484 266.79999999999995,290.21882684894484 L278.79999999999995,290.21882684894484 Q282.79999999999995,290.21882684894484 282.79999999999995,294.21882684894484 L282.79999999999995,298.7748133885536 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2025 Q3 영업이익: 7.49조원</title></path><path d="M284.79999999999995,298.7748133885536 L284.79999999999995,294.65370028143565 Q284.79999999999995,290.65370028143565 288.79999999999995,290.65370028143565 L300.79999999999995,290.65370028143565 Q304.79999999999995,290.65370028143565 304.79999999999995,294.65370028143565 L304.79999999999995,298.7748133885536 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2025 Q3 순이익: 7.11조원</title></path><text x="272.8" y="324" class="axis-label" text-anchor="middle">2025 Q3</text><path d="M364.0,298.7748133885536 L364.0,20.0 Q364.0,16.0 368.0,16.0 L380.0,16.0 Q384.0,16.0 384.0,20.0 L384.0,298.7748133885536 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2025 Q4 매출액: 247.54조원</title></path><path d="M386.0,298.7748133885536 L386.0,266.86597984882314 Q386.0,262.86597984882314 390.0,262.86597984882314 L402.0,262.86597984882314 Q406.0,262.86597984882314 406.0,266.86597984882314 L406.0,298.7748133885536 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2025 Q4 영업이익: 31.43조원</title></path><path d="M408.0,298.7748133885536 L408.0,265.0998734772912 Q408.0,261.0998734772912 412.0,261.0998734772912 L424.0,261.0998734772912 Q428.0,261.0998734772912 428.0,265.0998734772912 L428.0,298.7748133885536 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2025 Q4 순이익: 32.98조원</title></path><text x="396.0" y="324" class="axis-label" text-anchor="middle">2025 Q4</text><path d="M487.20000000000005,298.7748133885536 L487.20000000000005,149.84842884340796 Q487.20000000000005,145.84842884340796 491.20000000000005,145.84842884340796 L503.20000000000005,145.84842884340796 Q507.20000000000005,145.84842884340796 507.20000000000005,149.84842884340796 L507.20000000000005,298.7748133885536 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2026 Q1 매출액: 133.87조원</title></path><path d="M509.20000000000005,298.7748133885536 L509.20000000000005,237.3966139406014 Q509.20000000000005,233.3966139406014 513.2,233.3966139406014 L525.2,233.3966139406014 Q529.2,233.3966139406014 529.2,237.3966139406014 L529.2,298.7748133885536 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2026 Q1 영업이익: 57.23조원</title></path><path d="M531.2,298.7748133885536 L531.2,248.82841528049343 Q531.2,244.82841528049343 535.2,244.82841528049343 L547.2,244.82841528049343 Q551.2,244.82841528049343 551.2,248.82841528049343 L551.2,298.7748133885536 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2026 Q1 순이익: 47.23조원</title></path><text x="519.2" y="324" class="axis-label" text-anchor="middle">2026 Q1</text><path d="M610.4,298.7748133885536 L610.4,259.79383113353936 Q610.4,255.79383113353933 614.4,255.79383113353933 L626.4,255.79383113353933 Q630.4,255.79383113353933 630.4,259.79383113353936 L630.4,298.7748133885536 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2026 Q2 매출액: 37.63조원</title></path><path d="M632.4,298.7748133885536 L632.4,265.92399263303207 Q632.4,261.92399263303207 636.4,261.92399263303207 L648.4,261.92399263303207 Q652.4,261.92399263303207 652.4,265.92399263303207 L652.4,298.7748133885536 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2026 Q2 영업이익: 32.26조원</title></path><path d="M654.4,298.7748133885536 L654.4,274.9031186885675 Q654.4,270.9031186885675 658.4,270.9031186885675 L670.4,270.9031186885675 Q674.4,270.9031186885675 674.4,274.9031186885675 L674.4,298.7748133885536 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2026 Q2 순이익: 24.40조원</title></path><text x="642.4" y="324" class="axis-label" text-anchor="middle">2026 Q2</text></svg>
+      <table class="fin-table">
+        <thead>
+          <tr>
+            <th>분기</th><th>매출액</th><th>전분기비</th><th>영업이익</th><th>영업이익률</th>
+            <th>순이익</th><th>순이익률</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td>2026 Q2</td>
+            <td>37.63조원</td>
+            <td>-71.9%</td>
+            <td>32.26조원</td>
+            <td>85.7%</td>
+            <td>24.40조원</td>
+            <td>64.8%</td>
+          </tr>
+          
+          <tr>
+            <td>2026 Q1</td>
+            <td>133.87조원</td>
+            <td>-45.9%</td>
+            <td>57.23조원</td>
+            <td>42.8%</td>
+            <td>47.23조원</td>
+            <td>35.3%</td>
+          </tr>
+          
+          <tr>
+            <td>2025 Q4</td>
+            <td>247.54조원</td>
+            <td>2,053.4%</td>
+            <td>31.43조원</td>
+            <td>12.7%</td>
+            <td>32.98조원</td>
+            <td>13.3%</td>
+          </tr>
+          
+          <tr>
+            <td>2025 Q3</td>
+            <td>11.50조원</td>
+            <td>351.3%</td>
+            <td>7.49조원</td>
+            <td>65.2%</td>
+            <td>7.11조원</td>
+            <td>61.8%</td>
+          </tr>
+          
+          <tr>
+            <td>2025 Q2</td>
+            <td>-4.57조원</td>
+            <td>미확인</td>
+            <td>-2.01조원</td>
+            <td>43.9%</td>
+            <td>-3.11조원</td>
+            <td>67.9%</td>
+          </tr>
+          
+        </tbody>
+      </table>
+      <p class="note">"전분기비"는 전년 동기가 아닌 직전 분기 대비 증감률입니다(계절성이 있는 업종은 전년 동기와 다를 수 있음에 유의).</p>
+      <p class="note">한국 기업은 분기·반기·사업보고서의 누적 수치를 차감해, 미국 기업은 연간(10-K) 수치에서 1~3분기(10-Q) 합계를 뺀 값으로 4분기를 역산해 단독 분기 실적을 산출합니다. 계산에 필요한 원자료 중 하나라도 확인되지 않으면 해당 분기는 표에서 제외했습니다(추정 없음). 이 방식 특성상 일회성 손익이나 정정공시가 있으면 특정 분기의 수치가 유달리 크거나 작게 나타날 수 있으니, 크게 튀는 값은 원문 공시와 대조해 보시길 권장합니다.</p>
+    </div>
+  </section>
+  
+
+  <section>
+    <h2>주주환원정책 <span class="badge ai">AI 해석</span></h2>
+    <div class="card"><p>제공된 공시 데이터를 바탕으로 한 삼성전자의 주주환원정책 추세 해석은 다음과 같다.</p>
+<ul>
+  <li><strong>주당배당금 추이:</strong> 2021년부터 2023년까지 <strong>1,444원</strong>으로 일정한 수준을 유지하였으나, 2024년 <strong>1,446원</strong>으로 소폭 증가한 데 이어 2025년에는 <strong>1,668원</strong>으로 상향되었습니다.</li>
+  <li><strong>당기순이익 추이:</strong> 2021년 <strong>39.91조원</strong>에서 2022년 <strong>55.65조원</strong>으로 증가한 후, 2023년 <strong>15.49조원</strong>으로 급감하였습니다. 이후 2024년 <strong>34.45조원</strong>, 2025년 <strong>45.21조원</strong>으로 변동성을 보였습니다.</li>
+  <li><strong>배당 성향 및 안정성 해석:</strong> 순이익의 급격한 변동(예: 2023년 순이익 감소 구간) 속에서도 배당금은 <strong>1,444원</strong>으로 유지되는 등 하방 경직성을 보였고, 2025년에는 배당금이 <strong>1,668원</strong>으로 증가하여 전반적으로 안정적인 주주환원 기조를 유지하고 있는 것으로 해석됩니다.</li>
+  <li><strong>자사주 매입 관련:</strong> 자사주 매입 상세 내역 등은 본 공시 데이터에서 확인되지 않음.</li>
+</ul></div>
+  </section>
+
+  <section>
+    <h2>산업 전망 (1년 · 5년 · 10년) <span class="badge ai">AI 해석</span></h2>
+    <div class="card"><p><strong>1년 시계열 전망</strong></p>
+<ul>
+  <li><strong>예상되는 주요 흐름 및 변화 요인:</strong> 향후 1년 동안 폴더블폰 시장에서는 경쟁사 진입에도 불구하고 삼성전자의 갤럭시 Z 폴드8 판매량이 오히려 늘어나는 등의 변화가 나타날 수 있으며, 글로벌 폴더블폰 시장 성장세와 맞물려 점유율 변화가 예상된다 <a href="https://www.mk.co.kr/article/12157312" target="_blank" rel="noopener noreferrer">[출처]</a>. 또한 반도체 부문에서는 AI로 인한 수요의 구조적 증가 기대와 함께 실적 발표 및 수급 흐름이 주요 변수로 작용할 수 있다 <a href="https://biz.newdaily.co.kr/site/data/html/2026/09/20/2026092000038.html" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://www.kado.net/news/articleView.html?idxno=2073748" target="_blank" rel="noopener noreferrer">[출처]</a>. 노사 관계 측면에서는 초기업노조가 DS 부문 중심의 별도 교섭을 추진하는 등 조직 재편이 진행 중이다 <a href="http://weekly.chosun.com/news/articleView.html?idxno=55446" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+  <li><strong>삼성전자에 미칠 영향(기회/위협):</strong> 폴더블 시장의 저변 확대는 차세대 폼팩터 시장 성장의 발판이 될 수 있는 기회이나, 환율 하락이나 노사 갈등 및 임단협 관련 불확실성은 기업의 이익 전망과 수급에 위협 요인으로 작용할 수 있다 <a href="http://weekly.chosun.com/news/articleView.html?idxno=55446" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://www.news1.kr/industry/general-industry/6296151" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://www.m-i.kr/news/articleView.html?idxno=1416021" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://www.yna.co.kr/view/AKR20260911137700003?input=1195m" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+</ul>
+
+<p><strong>5년 시계열 전망</strong></p>
+<ul>
+  <li><strong>예상되는 주요 흐름 및 변화 요인:</strong> 향후 5년간 글로벌 폴더블 패널 출하량이 연평균 성장세를 보일 것으로 예상되는 가운데, 애플 등 경쟁사들의 출하량 급증으로 인해 삼성전자의 점유율 변화가 수반될 수 있다 <a href="https://it.chosun.com/news/articleView.html?idxno=2023092170175" target="_blank" rel="noopener noreferrer">[출처]</a>. 아울러 TV 시장에서는 2028년 이후 OLED TV 출하량이 하락하고 2030년경 RGB LED TV 출하량이 이를 웃돌 가능성이 제기된다 <a href="https://zdnet.co.kr/view/?no=20260919122814" target="_blank" rel="noopener noreferrer">[출처]</a>. 반도체 생산 측면에서는 남부권으로의 공장 이전 등을 통해 전력 비용 절감 등을 모색하는 흐름이 나타날 수 있다 <a href="https://www.fnnews.com/news/202609171449357941" target="_blank" rel="noopener noreferrer">[출처]</a>. 전망이 멀어질수록 산업 환경의 불확실성은 더 커질 수 있다.</li>
+  <li><strong>삼성전자에 미칠 영향(기회/위협):</strong> 모바일 및 디스플레이 부문에서 새로운 폼팩터와 디스플레이 기술 전환(예: RGB LED TV 부상)에 대응해야 하는 과제와 기회가 공존하며, 전력 비용 구조 개선 등 원가 절감 요소는 긍정적 영향을 줄 수 있다 <a href="https://www.fnnews.com/news/202609171449357941" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://zdnet.co.kr/view/?no=20260919122814" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://it.chosun.com/news/articleView.html?idxno=2023092170175" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+</ul>
+
+<p><strong>10년 시계열 전망</strong></p>
+<ul>
+  <li><strong>예상되는 주요 흐름 및 변화 요인:</strong> 2030년까지 세계 반도체 시장은 AI로 인한 수요의 구조적 증가 등에 힘입어 1조 6000억 달러를 돌파할 것으로 전망되고 있으나, 장기 시계열인 만큼 시장의 정확한 속도나 방향에 대해서는 AI 속도조절론 등 다양한 변수가 존재한다 <a href="https://www.kado.net/news/articleView.html?idxno=2073748" target="_blank" rel="noopener noreferrer">[출처]</a>. 인재 육성 및 확보, 대외 협력(예: 일본과의 협력 등 전사적 전략)이 장기 경쟁력을 좌우할 수 있다 <a href="https://www.hankyung.com/article/2026091673916" target="_blank" rel="noopener noreferrer">[출처]</a>. 다만 10년 뒤의 장기 전망은 불확실성이 매우 높다.</li>
+  <li><strong>삼성전자에 미칠 영향(기회/위협):</strong> 거대한 반도체 시장 규모 확대는 빅테크와의 협력을 통해 큰 수혜를 입을 수 있는 기회이나, 장기적인 거시경제 변동성과 기술 패러다임 변화에 적절히 대응하지 못할 경우 위협에 직면할 수도 있다 <a href="https://www.kado.net/news/articleView.html?idxno=2073748" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+</ul>
+
+<p><strong>리스크 및 불확실성:</strong> 본 전망은 제공된 자료를 바탕으로 작성되었으나, 향후 5년 및 10년과 같이 시계열이 멀어질수록 산업 환경의 불확실성은 가중된다. 환율 변동, 노사 갈등 및 교섭 구조 변화, 글로벌 경쟁 심화, 그리고 AI 시장의 속도 조절 가능성 등은 삼성전자의 실적과 미래 전략에 중요한 변수로 작용할 수 있으며, 그 결과는 단정적으로 예측하기 어렵다 <a href="http://weekly.chosun.com/news/articleView.html?idxno=55446" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://www.news1.kr/industry/general-industry/6296151" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://www.kado.net/news/articleView.html?idxno=2073748" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://www.yna.co.kr/view/AKR20260911137700003?input=1195m" target="_blank" rel="noopener noreferrer">[출처]</a>.</p></div>
+  </section>
+
+  <section>
+    <h2>데이터 출처</h2>
+    <div class="card">
+      <p><strong>공식 재무데이터</strong></p>
+      <ul class="source-list">
+        <li>DART 전자공시 사업보고서(reprt_code=11011), corp_code=00126380</li>
+        <li>DART 전자공시 분기·반기·사업보고서, corp_code=00126380</li>
+      </ul>
+      
+      <p><strong>검색 기반 참고자료</strong></p>
+      <ul class="source-list">
+        
+        <li><a href="http://weekly.chosun.com/news/articleView.html?idxno=55446" target="_blank" rel="noopener noreferrer">삼성전자 최대 노조 &#39;반도체만&#39; 남는다…96% 찬성으로 DX 배제</a> · Sat, 19 Sep 2026 22:08:00 +0900</li>
+        
+        <li><a href="https://www.mk.co.kr/article/12156589" target="_blank" rel="noopener noreferrer">갤럭시 잘 팔리더니…삼성 엑시노스 부활 기지개</a> · Fri, 18 Sep 2026 16:30:00 +0900</li>
+        
+        <li><a href="https://www.ytn.co.kr/_ln/0102_202609191209333984" target="_blank" rel="noopener noreferrer">삼성전자 초기업노동조합, DS 부분 중심으로 재편</a> · Sat, 19 Sep 2026 12:09:00 +0900</li>
+        
+        <li><a href="https://www.dnews.co.kr/uhtml/view.jsp?idxno=202609191638115540743" target="_blank" rel="noopener noreferrer">삼성전자 초기업노조, DS만 품는다…DX와 ‘각자도생’ 본격화</a> · Sat, 19 Sep 2026 17:00:00 +0900</li>
+        
+        <li><a href="https://www.edaily.co.kr/News/Read?newsId=01170966645582088&amp;mediaCodeNo=257&amp;utm_source=naver&amp;utm_medium=referral&amp;utm_campaign=news_syndication&amp;utm_content=original_article" target="_blank" rel="noopener noreferrer">삼성전자, 美 &#39;테크포럼&#39; 개최…노태문 사장 &#34;AX 리드 선도기업 도약&#34;</a> · Sun, 20 Sep 2026 08:44:00 +0900</li>
+        
+        <li><a href="https://www.segye.com/newsView/20260920505031?OutUrl=naver" target="_blank" rel="noopener noreferrer">삼성전자 경영진 총출동… 2026 테크 포럼 개최</a> · Sun, 20 Sep 2026 13:10:00 +0900</li>
+        
+        <li><a href="https://www.news1.kr/industry/electronics/6296308" target="_blank" rel="noopener noreferrer">삼성전자, 실리콘밸리서 AI·로봇 청사진…글로벌 인재와 기술교류</a> · Sun, 20 Sep 2026 09:20:00 +0900</li>
+        
+        <li><a href="https://www.joongang.co.kr/article/25463350" target="_blank" rel="noopener noreferrer">삼성전자, 실리콘밸리서 AI·로봇 전략 공유…노태문 “AX 선도기업 도약...</a> · Sun, 20 Sep 2026 12:04:00 +0900</li>
+        
+        <li><a href="https://www.chosun.com/economy/tech_it/2026/09/17/7H73YLXEEJH6VPPMECAJYZTN74/?utm_source=naver&amp;utm_medium=referral&amp;utm_campaign=naver-news" target="_blank" rel="noopener noreferrer">애플이 폴더블 아이폰 내놓자, 삼성 갤폴드가 더 팔렸다</a> · Thu, 17 Sep 2026 11:22:00 +0900</li>
+        
+        <li><a href="https://www.mk.co.kr/article/12157344" target="_blank" rel="noopener noreferrer">“TSMC·삼성전자 빈틈 노렸더니, 주문 감당 안 돼”…목표가 20만원으로...</a> · Sun, 20 Sep 2026 11:17:00 +0900</li>
+        
+        <li><a href="https://view.asiae.co.kr/article/2026091815270845808" target="_blank" rel="noopener noreferrer">삼성 엑시노스, 2분기 점유율 9%…집계 이래 &#39;최대치&#39;</a> · Fri, 18 Sep 2026 15:27:00 +0900</li>
+        
+        <li><a href="https://www.newsis.com/view/NISX20260918_0003795691" target="_blank" rel="noopener noreferrer">삼성전자, 2Q 글로벌 스마트폰 AP 점유율 9%…&#34;2024년 이후 최고&#34;</a> · Fri, 18 Sep 2026 14:21:00 +0900</li>
+        
+        <li><a href="https://www.hankyung.com/article/202609183963g" target="_blank" rel="noopener noreferrer">&#34;2년 만에 최고&#34; 삼성전자 일냈다…갤럭시 잘 팔리더니 &#39;깜짝&#39;</a> · Fri, 18 Sep 2026 15:32:00 +0900</li>
+        
+        <li><a href="https://www.kmib.co.kr/article/view.asp?arcid=9000013401&amp;cp=nv" target="_blank" rel="noopener noreferrer">“갤럭시S26 덕분” 삼성 엑시노스, 2분기 점유율 9%…역대 최대</a> · Fri, 18 Sep 2026 14:45:00 +0900</li>
+        
+        <li><a href="https://biz.chosun.com/it-science/ict/2026/09/18/XCASN3WELVC6FHMHYSV4WHJFAY/?utm_source=naver&amp;utm_medium=original&amp;utm_campaign=biz" target="_blank" rel="noopener noreferrer">삼성 엑시노스, 2분기 AP 점유율 9% 최고치 경신</a> · Fri, 18 Sep 2026 15:22:00 +0900</li>
+        
+        <li><a href="https://www.mk.co.kr/article/12157312" target="_blank" rel="noopener noreferrer">“애플 폴더블 내놨는데, 삼성이 웃네요”…공개 이후 갤폴드8 판매량 ...</a> · Sun, 20 Sep 2026 10:15:00 +0900</li>
+        
+        <li><a href="https://www.hankyung.com/article/2026091673916" target="_blank" rel="noopener noreferrer">[단독] 이재용, 日 참의원 대표단과 깜짝 회동…반도체 협력 논의</a> · Wed, 16 Sep 2026 09:46:00 +0900</li>
+        
+        <li><a href="https://biz.newdaily.co.kr/site/data/html/2026/09/20/2026092000038.html" target="_blank" rel="noopener noreferrer">삼성전자·SK하이닉스 35조 자사주 매입 내달 끝난다 … 증시 &#39;수급 공백...</a> · Sun, 20 Sep 2026 11:52:00 +0900</li>
+        
+        <li><a href="https://www.fnnews.com/news/202609171449357941" target="_blank" rel="noopener noreferrer">[단독]삼성 반도체공장 남쪽 가면 年2000억 전기료 절감</a> · Sun, 20 Sep 2026 13:00:00 +0900</li>
+        
+        <li><a href="https://www.news1.kr/industry/general-industry/6296151" target="_blank" rel="noopener noreferrer">삼성전자·포스코 노조 &#39;휘청&#39;…갈등 뇌관 &#39;노조위원장 논란&#39;</a> · Sun, 20 Sep 2026 07:00:00 +0900</li>
+        
+      </ul>
+      
+    </div>
+  </section>
+
+  <footer>
+    Generated by 종목분석 Agent · 2026-09-20 13:47
+  </footer>
+</div>
+
+<script>
+  (function () {
+    var saved = localStorage.getItem('stockagent-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  })();
+  function toggleTheme() {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('stockagent-theme', next);
+  }
+</script>
+</body>
+</html>
