@@ -1,5 +1,12 @@
 [
   {
+    "ticker": "AAPL",
+    "name": "Apple Inc.",
+    "market": "US",
+    "date": "2026-09-20",
+    "filename": "AAPL_2026-09-20.html"
+  },
+  {
     "ticker": "PLUG",
     "name": "PLUG POWER INC",
     "market": "US",
