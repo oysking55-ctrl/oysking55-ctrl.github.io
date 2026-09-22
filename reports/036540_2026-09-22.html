@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SFA반도체(036540) 종목분석 리포트</title>
+<style>
+  :root {
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --grid-line:      #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6;
+    --series-2:       #eb6834;
+    --series-3:       #1baf7a;
+    --series-4:       #eda100;
+    --status-good:    #0ca30c;
+    --status-warning: #fab219;
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --grid-line:      #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --series-1:       #3987e5;
+    --series-2:       #d95926;
+    --series-3:       #199e70;
+    --series-4:       #c98500;
+    --status-good:    #0ca30c;
+    --status-warning: #fab219;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --grid-line:      #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --series-1:       #3987e5;
+      --series-2:       #d95926;
+      --series-3:       #199e70;
+      --series-4:       #c98500;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page-plane);
+    color: var(--text-primary);
+    line-height: 1.6;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 24px 20px 64px; }
+  header.report-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 16px; margin-bottom: 8px; flex-wrap: wrap;
+  }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  .subtitle { color: var(--text-secondary); font-size: 14px; margin: 0; }
+  .meta { color: var(--text-muted); font-size: 13px; margin-top: 6px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+  .chip-btn {
+    background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 12px; font-size: 13px; cursor: pointer;
+    text-decoration: none; display: inline-block; white-space: nowrap;
+  }
+  .chip-btn:hover { border-color: var(--series-1); }
+  .disclaimer {
+    background: var(--surface-1); border: 1px solid var(--border); border-left: 4px solid var(--status-warning);
+    border-radius: 6px; padding: 12px 16px; font-size: 13px; color: var(--text-secondary); margin: 16px 0 28px;
+  }
+  section { margin: 32px 0; }
+  h2 {
+    font-size: 18px; border-bottom: 1px solid var(--grid-line); padding-bottom: 8px; margin-bottom: 14px;
+  }
+  .badge {
+    display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+    margin-left: 8px; vertical-align: middle;
+  }
+  .badge.fact { background: rgba(42,120,214,0.14); color: var(--series-1); }
+  .badge.ai { background: rgba(235,104,52,0.14); color: var(--series-2); }
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px;
+  }
+  .card p:first-child { margin-top: 0; }
+  .card p:last-child { margin-bottom: 0; }
+  .card a { color: var(--series-1); }
+  table.fin-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 14px; }
+  table.fin-table th, table.fin-table td {
+    text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--grid-line);
+    font-variant-numeric: tabular-nums;
+  }
+  table.fin-table th:first-child, table.fin-table td:first-child { text-align: left; }
+  table.fin-table th { color: var(--text-secondary); font-weight: 600; font-size: 12px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 10px 0 4px; font-size: 12px; color: var(--text-secondary); }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .fin-chart .grid-line { stroke: var(--grid-line); stroke-width: 1; }
+  .fin-chart .baseline { stroke: var(--baseline); stroke-width: 1; }
+  .fin-chart .axis-label { fill: var(--text-muted); font-size: 10px; }
+  .fin-chart .bar { transition: opacity .15s; }
+  .fin-chart .bar:hover { opacity: 0.75; }
+  .chart-empty { color: var(--text-muted); font-size: 13px; }
+  .kpi-row { display: flex; gap: 24px; margin: 10px 0 4px; flex-wrap: wrap; }
+  .kpi { font-size: 13px; color: var(--text-secondary); }
+  .kpi b { display: block; font-size: 18px; color: var(--text-primary); font-weight: 600; }
+  .note { font-size: 12px; color: var(--text-muted); margin-top: 10px; }
+  ul.source-list { font-size: 13px; color: var(--text-secondary); padding-left: 18px; }
+  ul.source-list a { color: var(--series-1); }
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--grid-line); font-size: 12px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="report-header">
+    <div>
+      <h1>SFA반도체 <span class="subtitle">(KR · 036540)</span></h1>
+      <p class="subtitle">업종 정보 미확인</p>
+      <p class="meta">리포트 생성: 2026-09-22 09:12 · 재무 데이터 기준일: 2026-09-22</p>
+    </div>
+    <div class="header-actions">
+      <a class="chip-btn" href="./index.html">전체 리포트 목록</a>
+      <button id="theme-toggle" class="chip-btn" type="button" onclick="toggleTheme()">라이트/다크 전환</button>
+    </div>
+  </header>
+
+  <div class="disclaimer">
+    본 리포트는 AI가 생성한 콘텐츠입니다. <span class="badge fact">공식데이터</span> 배지가 붙은 수치는
+    DART/SEC 공시 원문을 코드로 그대로 파싱한 값이며, <span class="badge ai">AI 해석</span> 배지가 붙은
+    서술은 검색 자료를 근거로 AI가 작성한 해석/전망입니다. 투자 판단과 그 결과에 대한 책임은 전적으로
+    이용자 본인에게 있으며, 본 리포트는 투자 권유가 아닙니다.
+  </div>
+
+  <section>
+    <h2>사업 분야 · 경쟁현황 · 경쟁력 <span class="badge ai">AI 해석</span></h2>
+    <div class="card"><p><strong>1. 주요 사업 부문 및 제품·서비스 구성</strong></p>
+<ul>
+  <li>SFA반도체의 전신인 STS반도체통신은 1998년 삼성전자 아산사업장 후공정 부문이 분사하여 설립되었다 <a href="https://www.businesspost.co.kr/BP?command=article_view&num=441907" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+  <li>지난해 기준 제품별 매출 비중은 서버·PC가 60%로 가장 높으며, 모바일 IC 19%, 모바일 15%, 로직 IC 6% 순으로 나타났다 <a href="https://www.edaily.co.kr/News/Read?newsId=02601046645575856&mediaCodeNo=257&utm_source=naver&utm_medium=referral&utm_campaign=news_syndication&utm_content=original_article" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+</ul>
+<p><strong>2. 속한 산업 내 경쟁현황</strong></p>
+<ul>
+  <li>제공된 자료로는 구체적인 시장점유율 수치나 전체 경쟁사 순위는 확인되지 않으나, 반도체 상장기업 브랜드평판 순위 등에 상위 기업들과 함께 언급되고 있다 <a href="http://www.thebigdata.co.kr/view.php?ud=202609030748444838d0a8833aad_23" target="_blank" rel="noopener noreferrer">[출처]</a>. 또한 HBM 및 AI 반도체 소부장 관련 ETF 상품의 주요 투자 기업 중 하나로 편입되어 있다 <a href="https://view.asiae.co.kr/article/2026091508535242949" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+</ul>
+<p><strong>3. 경쟁력(강점)과 약점/리스크 요인</strong></p>
+<ul>
+  <li><strong>강점:</strong> 범핑 및 패키징 기술을 보유하고 있으며, 이러한 기술적 우위는 제품 성능과 수율을 좌우하는 핵심 요소로서 차별화된 강점으로 작용한다 <a href="https://www.pinpointnews.co.kr/news/articleView.html?idxno=388471" target="_blank" rel="noopener noreferrer">[출처]</a>. 또한 필리핀 공장과 국내 사업장을 연계한 글로벌 생산 체계를 갖추고 있다 <a href="https://www.pinpointnews.co.kr/news/articleView.html?idxno=388471" target="_blank" rel="noopener noreferrer">[출처]</a>. 더불어 DDR5 후공정 외주 물량 확대 등의 수혜 기대감이 존재한다 <a href="http://www.joseilbo.com/news/news_read.php?uid=575610&class=17&grp=" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+  <li><strong>약점 및 리스크 요인:</strong> 2022년 매출액 6994억원, 영업이익 629억원으로 최대 실적을 기록한 이후 실적 부진이 이어진 바 있다 <a href="https://www.edaily.co.kr/News/Read?newsId=02601046645575856&mediaCodeNo=257&utm_source=naver&utm_medium=referral&utm_campaign=news_syndication&utm_content=original_article" target="_blank" rel="noopener noreferrer">[출처]</a>. 과거 2015년 계열사의 유동성 위기로 워크아웃에 들어갔던 이력이 있다 <a href="https://www.businesspost.co.kr/BP?command=article_view&num=441907" target="_blank" rel="noopener noreferrer">[출처]</a>. 그 외 구체적인 재무적 리스크나 추가적인 약점에 대한 상세 정보는 제공된 자료로 확인되지 않음 <a href="https://www.edaily.co.kr/News/Read?newsId=02601046645575856&mediaCodeNo=257&utm_source=naver&utm_medium=referral&utm_campaign=news_syndication&utm_content=original_article" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+</ul></div>
+  </section>
+
+  <section>
+    <h2>최근 5개년 경영현황 <span class="badge fact">공식데이터</span></h2>
+    <div class="card">
+      <div class="kpi-row">
+        <div class="kpi">매출 CAGR<b>-13.0%</b></div>
+        <div class="kpi">순이익 CAGR<b>-45.7+54.3j%</b></div>
+        
+        <div class="kpi">현재가(비공식 참고)<b>10,620원</b></div>
+        
+      </div>
+      <div class="legend">
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-1)"></span>매출액</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-2)"></span>영업이익</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-3)"></span>순이익</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-4)"></span>EBITDA</span>
+        
+      </div>
+      <svg viewBox="0 0 720 340" width="100%" role="img" aria-label="SFA반도체 5개년 재무 추이 차트" class="fin-chart"><line x1="88" y1="304.0" x2="704" y2="304.0" class="grid-line" /><text x="80" y="304.0" class="axis-label" text-anchor="end" dominant-baseline="middle">-196.3억원</text><line x1="88" y1="232.0" x2="704" y2="232.0" class="grid-line" /><text x="80" y="232.0" class="axis-label" text-anchor="end" dominant-baseline="middle">1,601.3억원</text><line x1="88" y1="160.0" x2="704" y2="160.0" class="grid-line" /><text x="80" y="160.0" class="axis-label" text-anchor="end" dominant-baseline="middle">3,398.9억원</text><line x1="88" y1="88.0" x2="704" y2="88.0" class="grid-line" /><text x="80" y="88.0" class="axis-label" text-anchor="end" dominant-baseline="middle">5,196.5억원</text><line x1="88" y1="16.0" x2="704" y2="16.0" class="grid-line" /><text x="80" y="16.0" class="axis-label" text-anchor="end" dominant-baseline="middle">6,994.1억원</text><line x1="88" y1="296.1" x2="704" y2="296.1" class="baseline" /><path d="M106.6,296.13883667838394 L106.6,43.35249254746077 Q106.6,39.35249254746077 110.6,39.35249254746077 L122.6,39.35249254746077 Q126.6,39.35249254746077 126.6,43.35249254746077 L126.6,296.13883667838394 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2021년 매출액: 6,411.1억원</title></path><path d="M128.6,296.13883667838394 L128.6,273.50475585487806 Q128.6,269.50475585487806 132.6,269.50475585487806 L144.6,269.50475585487806 Q148.6,269.50475585487806 148.6,273.50475585487806 L148.6,296.13883667838394 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2021년 영업이익: 665.0억원</title></path><path d="M150.6,296.13883667838394 L150.6,278.0696518175025 Q150.6,274.0696518175025 154.6,274.0696518175025 L166.6,274.0696518175025 Q170.6,274.0696518175025 170.6,278.0696518175025 L170.6,296.13883667838394 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2021년 순이익: 551.0억원</title></path><text x="149.6" y="324" class="axis-label" text-anchor="middle">2021</text><path d="M229.79999999999998,296.13883667838394 L229.79999999999998,20.0 Q229.79999999999998,16.0 233.79999999999998,16.0 L245.79999999999998,16.0 Q249.79999999999998,16.0 249.79999999999998,20.0 L249.79999999999998,296.13883667838394 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2022년 매출액: 6,994.1억원</title></path><path d="M251.79999999999998,296.13883667838394 L251.79999999999998,274.95271351653344 Q251.79999999999998,270.95271351653344 255.79999999999998,270.95271351653344 L267.79999999999995,270.95271351653344 Q271.79999999999995,270.95271351653344 271.79999999999995,274.95271351653344 L271.79999999999995,296.13883667838394 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2022년 영업이익: 628.8억원</title></path><path d="M273.79999999999995,296.13883667838394 L273.79999999999995,281.93653288621095 Q273.79999999999995,277.93653288621095 277.79999999999995,277.93653288621095 L289.79999999999995,277.93653288621095 Q293.79999999999995,277.93653288621095 293.79999999999995,281.93653288621095 L293.79999999999995,296.13883667838394 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2022년 순이익: 454.5억원</title></path><text x="272.8" y="324" class="axis-label" text-anchor="middle">2022</text><path d="M353.0,296.13883667838394 L353.0,124.87041805004009 Q353.0,120.87041805004009 357.0,120.87041805004009 L369.0,120.87041805004009 Q373.0,120.87041805004009 373.0,124.87041805004009 L373.0,296.13883667838394 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2023년 매출액: 4,375.9억원</title></path><path d="M375.0,296.13883667838394 L395.0,296.13883667838394 L395.0,298.8318201155447 Q395.0,302.8318201155447 391.0,302.8318201155447 L379.0,302.8318201155447 Q375.0,302.8318201155447 375.0,298.8318201155447 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2023년 영업이익: -167.1억원</title></path><path d="M397.0,296.13883667838394 L417.0,296.13883667838394 L417.0,297.7637909612441 Q417.0,301.7637909612441 413.0,301.7637909612441 L401.0,301.7637909612441 Q397.0,301.7637909612441 397.0,297.7637909612441 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2023년 순이익: -140.4억원</title></path><text x="396.0" y="324" class="axis-label" text-anchor="middle">2023</text><path d="M476.20000000000005,296.13883667838394 L476.20000000000005,139.7315441688172 Q476.20000000000005,135.7315441688172 480.20000000000005,135.7315441688172 L492.20000000000005,135.7315441688172 Q496.20000000000005,135.7315441688172 496.20000000000005,139.7315441688172 L496.20000000000005,296.13883667838394 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2024년 매출액: 4,004.8억원</title></path><path d="M520.2,296.13883667838394 L520.2,291.94435155053645 Q520.2,287.94435155053645 524.2,287.94435155053645 L536.2,287.94435155053645 Q540.2,287.94435155053645 540.2,291.94435155053645 L540.2,296.13883667838394 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2024년 순이익: 204.6억원</title></path><text x="519.2" y="324" class="axis-label" text-anchor="middle">2024</text><path d="M599.4,296.13883667838394 L599.4,152.98672569579634 Q599.4,148.98672569579634 603.4,148.98672569579634 L615.4,148.98672569579634 Q619.4,148.98672569579634 619.4,152.98672569579634 L619.4,296.13883667838394 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2025년 매출액: 3,673.9억원</title></path><path d="M621.4,296.13883667838394 L641.4,296.13883667838394 L641.4,300.0 Q641.4,304.0 637.4,304.0 L625.4,304.0 Q621.4,304.0 621.4,300.0 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2025년 영업이익: -196.3억원</title></path><path d="M643.4,296.13883667838394 L663.4,296.13883667838394 L663.4,299.80146559395274 Q663.4,303.80146559395274 659.4,303.80146559395274 L647.4,303.80146559395274 Q643.4,303.80146559395274 643.4,299.80146559395274 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2025년 순이익: -191.3억원</title></path><text x="642.4" y="324" class="axis-label" text-anchor="middle">2025</text></svg>
+      <table class="fin-table">
+        <thead>
+          <tr>
+            <th>연도</th><th>매출액</th><th>YoY</th><th>영업이익</th><th>영업이익률</th>
+            <th>순이익</th><th>순이익률</th><th>EBITDA</th><th>주당배당금</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td>2025</td>
+            <td>3,673.9억원</td>
+            <td>-8.3%</td>
+            <td>-196.3억원</td>
+            <td>-5.3%</td>
+            <td>-191.3억원</td>
+            <td>-5.2%</td>
+            <td>미확인</td>
+            <td>미확인</td>
+          </tr>
+          
+          <tr>
+            <td>2024</td>
+            <td>4,004.8억원</td>
+            <td>-8.5%</td>
+            <td>-31,004,226원</td>
+            <td>-0.0%</td>
+            <td>204.6억원</td>
+            <td>5.1%</td>
+            <td>미확인</td>
+            <td>미확인</td>
+          </tr>
+          
+          <tr>
+            <td>2023</td>
+            <td>4,375.9억원</td>
+            <td>-37.4%</td>
+            <td>-167.1억원</td>
+            <td>-3.8%</td>
+            <td>-140.4억원</td>
+            <td>-3.2%</td>
+            <td>미확인</td>
+            <td>미확인</td>
+          </tr>
+          
+          <tr>
+            <td>2022</td>
+            <td>6,994.1억원</td>
+            <td>9.1%</td>
+            <td>628.8억원</td>
+            <td>9.0%</td>
+            <td>454.5억원</td>
+            <td>6.5%</td>
+            <td>미확인</td>
+            <td>미확인</td>
+          </tr>
+          
+          <tr>
+            <td>2021</td>
+            <td>6,411.1억원</td>
+            <td>미확인</td>
+            <td>665.0억원</td>
+            <td>10.4%</td>
+            <td>551.0억원</td>
+            <td>8.6%</td>
+            <td>미확인</td>
+            <td>미확인</td>
+          </tr>
+          
+        </tbody>
+      </table>
+      
+      <p class="note">EBITDA는 영업이익 + 감가상각비/무형자산상각비로 산출했으며, 공시에서 상각비를 특정할 수 없는 연도는 "미확인"으로 표기했습니다(임의 추정 없음).</p>
+      
+      <p class="note">현재가/시가총액은 비공식 참고용 시세(yfinance)이며 공식 공시 데이터가 아닙니다.</p>
+      
+    </div>
+  </section>
+
+  
+  <section>
+    <h2>최근 5분기 경영현황 <span class="badge fact">공식데이터</span></h2>
+    <div class="card">
+      <div class="legend">
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-1)"></span>매출액</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-2)"></span>영업이익</span>
+        
+        <span class="legend-item"><span class="legend-dot" style="background:var(--series-3)"></span>순이익</span>
+        
+      </div>
+      <svg viewBox="0 0 720 340" width="100%" role="img" aria-label="SFA반도체 5분기 재무 추이 차트" class="fin-chart"><line x1="88" y1="304.0" x2="704" y2="304.0" class="grid-line" /><text x="80" y="304.0" class="axis-label" text-anchor="end" dominant-baseline="middle">-141.6억원</text><line x1="88" y1="232.0" x2="704" y2="232.0" class="grid-line" /><text x="80" y="232.0" class="axis-label" text-anchor="end" dominant-baseline="middle">571.1억원</text><line x1="88" y1="160.0" x2="704" y2="160.0" class="grid-line" /><text x="80" y="160.0" class="axis-label" text-anchor="end" dominant-baseline="middle">1,283.8억원</text><line x1="88" y1="88.0" x2="704" y2="88.0" class="grid-line" /><text x="80" y="88.0" class="axis-label" text-anchor="end" dominant-baseline="middle">1,996.5억원</text><line x1="88" y1="16.0" x2="704" y2="16.0" class="grid-line" /><text x="80" y="16.0" class="axis-label" text-anchor="end" dominant-baseline="middle">2,709.2억원</text><line x1="88" y1="289.7" x2="704" y2="289.7" class="baseline" /><path d="M117.6,289.6950723524549 L117.6,289.6950723524549 Q117.6,288.84100192342856 118.4540704290263,288.84100192342856 L136.7459295709737,288.84100192342856 Q137.6,288.84100192342856 137.6,289.6950723524549 L137.6,289.6950723524549 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2025 Q2 매출액: 8.5억원</title></path><path d="M139.6,289.6950723524549 L159.6,289.6950723524549 L159.6,289.6950723524549 Q159.6,290.4098697477388 158.88520260471606,290.4098697477388 L140.31479739528393,290.4098697477388 Q139.6,290.4098697477388 139.6,289.6950723524549 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2025 Q2 영업이익: -7.1억원</title></path><path d="M161.6,289.6950723524549 L181.6,289.6950723524549 L181.6,289.6950723524549 Q181.6,291.0028664045668 180.29220594788805,291.0028664045668 L162.90779405211194,291.0028664045668 Q161.6,291.0028664045668 161.6,289.6950723524549 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2025 Q2 순이익: -12.9억원</title></path><text x="149.6" y="324" class="axis-label" text-anchor="middle">2025 Q2</text><path d="M240.79999999999998,289.6950723524549 L240.79999999999998,273.11892674655235 Q240.79999999999998,269.11892674655235 244.79999999999998,269.11892674655235 L256.79999999999995,269.11892674655235 Q260.79999999999995,269.11892674655235 260.79999999999995,273.11892674655235 L260.79999999999995,289.6950723524549 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2025 Q3 매출액: 203.7억원</title></path><path d="M284.79999999999995,289.6950723524549 L284.79999999999995,289.6950723524549 Q284.79999999999995,287.4924093626771 287.0026629897777,287.4924093626771 L302.5973370102222,287.4924093626771 Q304.79999999999995,287.4924093626771 304.79999999999995,289.6950723524549 L304.79999999999995,289.6950723524549 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2025 Q3 순이익: 21.8억원</title></path><text x="272.8" y="324" class="axis-label" text-anchor="middle">2025 Q3</text><path d="M364.0,289.6950723524549 L364.0,20.0 Q364.0,16.0 368.0,16.0 L380.0,16.0 Q384.0,16.0 384.0,20.0 L384.0,289.6950723524549 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2025 Q4 매출액: 2,709.2억원</title></path><path d="M386.0,289.6950723524549 L406.0,289.6950723524549 L406.0,299.1575953896744 Q406.0,303.1575953896744 402.0,303.1575953896744 L390.0,303.1575953896744 Q386.0,303.1575953896744 386.0,299.1575953896744 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2025 Q4 영업이익: -133.3억원</title></path><path d="M408.0,289.6950723524549 L428.0,289.6950723524549 L428.0,300.0 Q428.0,304.0 424.0,304.0 L412.0,304.0 Q408.0,304.0 408.0,300.0 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2025 Q4 순이익: -141.6억원</title></path><text x="396.0" y="324" class="axis-label" text-anchor="middle">2025 Q4</text><path d="M487.20000000000005,289.6950723524549 L487.20000000000005,185.2754386049909 Q487.20000000000005,181.2754386049909 491.20000000000005,181.2754386049909 L503.20000000000005,181.2754386049909 Q507.20000000000005,181.2754386049909 507.20000000000005,185.2754386049909 L507.20000000000005,289.6950723524549 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2026 Q1 매출액: 1,073.2억원</title></path><path d="M509.20000000000005,289.6950723524549 L529.2,289.6950723524549 L529.2,291.9361055504735 Q529.2,295.9361055504735 525.2,295.9361055504735 L513.2,295.9361055504735 Q509.20000000000005,295.9361055504735 509.20000000000005,291.9361055504735 Z" fill="var(--series-2)" class="bar" data-series="operating_income"><title>2026 Q1 영업이익: -61.8억원</title></path><path d="M531.2,289.6950723524549 L531.2,289.6950723524549 Q531.2,288.4962502097755 532.3988221426794,288.4962502097755 L550.0011778573207,288.4962502097755 Q551.2,288.4962502097755 551.2,289.6950723524549 L551.2,289.6950723524549 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2026 Q1 순이익: 11.9억원</title></path><text x="519.2" y="324" class="axis-label" text-anchor="middle">2026 Q1</text><path d="M610.4,289.6950723524549 L610.4,274.53158625595813 Q610.4,270.53158625595813 614.4,270.53158625595813 L626.4,270.53158625595813 Q630.4,270.53158625595813 630.4,274.53158625595813 L630.4,289.6950723524549 Z" fill="var(--series-1)" class="bar" data-series="revenue"><title>2026 Q2 매출액: 189.7억원</title></path><path d="M654.4,289.6950723524549 L674.4,289.6950723524549 L674.4,292.29922526689506 Q674.4,296.29922526689506 670.4,296.29922526689506 L658.4,296.29922526689506 Q654.4,296.29922526689506 654.4,292.29922526689506 Z" fill="var(--series-3)" class="bar" data-series="net_income"><title>2026 Q2 순이익: -65.4억원</title></path><text x="642.4" y="324" class="axis-label" text-anchor="middle">2026 Q2</text></svg>
+      <table class="fin-table">
+        <thead>
+          <tr>
+            <th>분기</th><th>매출액</th><th>전분기비</th><th>영업이익</th><th>영업이익률</th>
+            <th>순이익</th><th>순이익률</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td>2026 Q2</td>
+            <td>189.7억원</td>
+            <td>-82.3%</td>
+            <td>26,641,561원</td>
+            <td>0.1%</td>
+            <td>-65.4억원</td>
+            <td>-34.5%</td>
+          </tr>
+          
+          <tr>
+            <td>2026 Q1</td>
+            <td>1,073.2억원</td>
+            <td>-60.4%</td>
+            <td>-61.8억원</td>
+            <td>-5.8%</td>
+            <td>11.9억원</td>
+            <td>1.1%</td>
+          </tr>
+          
+          <tr>
+            <td>2025 Q4</td>
+            <td>2,709.2억원</td>
+            <td>1,230.2%</td>
+            <td>-133.3억원</td>
+            <td>-4.9%</td>
+            <td>-141.6억원</td>
+            <td>-5.2%</td>
+          </tr>
+          
+          <tr>
+            <td>2025 Q3</td>
+            <td>203.7억원</td>
+            <td>2,309.2%</td>
+            <td>4.2억원</td>
+            <td>2.1%</td>
+            <td>21.8억원</td>
+            <td>10.7%</td>
+          </tr>
+          
+          <tr>
+            <td>2025 Q2</td>
+            <td>8.5억원</td>
+            <td>미확인</td>
+            <td>-7.1억원</td>
+            <td>-83.7%</td>
+            <td>-12.9억원</td>
+            <td>-153.1%</td>
+          </tr>
+          
+        </tbody>
+      </table>
+      <p class="note">"전분기비"는 전년 동기가 아닌 직전 분기 대비 증감률입니다(계절성이 있는 업종은 전년 동기와 다를 수 있음에 유의).</p>
+      <p class="note">한국 기업은 분기·반기·사업보고서의 누적 수치를 차감해, 미국 기업은 연간(10-K) 수치에서 1~3분기(10-Q) 합계를 뺀 값으로 4분기를 역산해 단독 분기 실적을 산출합니다. 계산에 필요한 원자료 중 하나라도 확인되지 않으면 해당 분기는 표에서 제외했습니다(추정 없음). 이 방식 특성상 일회성 손익이나 정정공시가 있으면 특정 분기의 수치가 유달리 크거나 작게 나타날 수 있으니, 크게 튀는 값은 원문 공시와 대조해 보시길 권장합니다.</p>
+    </div>
+  </section>
+  
+
+  <section>
+    <h2>주주환원정책 <span class="badge ai">AI 해석</span></h2>
+    <div class="card"><p>제공된 공시 데이터를 바탕으로 SFA반도체의 최근 5개년 주주환원정책 추세를 분석한 결과는 다음과 같다.</p>
+<ul>
+  <li><strong>주당배당금 추이:</strong> 2021년부터 2025년까지의 주당배당금은 모두 <strong>미확인</strong>으로 표기되어 있어, 배당 지급 여부나 구체적인 증감 추세를 판단할 수 없다.</li>
+  <li><strong>당기순이익 추이:</strong> 2021년 551.0억원에서 2022년 454.5억원으로 감소한 뒤, 2023년 -140.4억원으로 적자 전환하였다. 2024년 204.6억원으로 흑자 전환에 성공했으나, 2025년 다시 -191.3억원으로 적자를 기록하며 변동성이 매우 크다.</li>
+  <li><strong>배당 성향 및 안정성:</strong> 배당과 관련된 구체적인 수치가 확인되지 않아 정확한 배당 성향 산출은 불가능하다. 다만, 당기순이익이 흑자와 적자를 오가는 불안정한 흐름을 보이고 있어 보수적인 관점에서 안정적인 주주환원정책이 지속되고 있다고 평가하기 어렵다.</li>
+  <li><strong>자사주 매입:</strong> 자사주 매입 상세 등 추가적인 주주환원 지표는 <strong>공시 데이터에서 확인되지 않음</strong>.</li>
+</ul></div>
+  </section>
+
+  <section>
+    <h2>산업 전망 (1년 · 5년 · 10년) <span class="badge ai">AI 해석</span></h2>
+    <div class="card"><p><strong>1년 시계열 전망</strong></p>
+<ul>
+  <li><strong>예상되는 주요 흐름/변화 요인:</strong> 전 세계 반도체 시장 규모가 확대되는 가운데, 메모리 가격 상승과 반도체 설비투자 확대 전망이 이어지고 있다 <a href="https://www.newspim.com/news/view/20260921000886" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://www.gukjenews.com/news/articleView.html?idxno=3701732" target="_blank" rel="noopener noreferrer">[출처]</a>. 조립 및 테스트 대행업체(OSAT) 등 반도체 소부장 기업들이 강한 흐름을 보이고 있으며 <a href="https://www.mk.co.kr/article/12158596" target="_blank" rel="noopener noreferrer">[출처]</a>, SFA반도체는 삼성전자 DDR5 외주 물량 관련 기대감과 함께 DDR5 테스트 설비 이관 및 가동률 상승 계획을 마주하고 있다 <a href="https://www.mk.co.kr/article/12157285" target="_blank" rel="noopener noreferrer">[출처]</a>. 다만 2분기 영업손실을 기록했고 연간 영업적자가 예상되는 등 실적 턴어라운드는 아직 전망 단계에 머물러 있다 <a href="https://www.mk.co.kr/article/12157285" target="_blank" rel="noopener noreferrer">[출처]</a>. 또한 적자 상태인 필리핀 자회사에 대한 대여금 잔액 증가로 인해 재무 부담 요인도 상존한다 <a href="https://www.ebn.co.kr/news/articleView.html?idxno=1723446" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+  <li><strong>회사에 미칠 영향:</strong> 견조한 업황과 DDR5 외주 물량 확대, 테스트 설비 이관은 가동률 상승과 실적 개선의 기회 요인이 될 수 있다 <a href="https://www.mk.co.kr/article/12157285" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://www.newspim.com/news/view/20260921000886" target="_blank" rel="noopener noreferrer">[출처]</a>. 반면, 단기적인 영업적자 지속 가능성과 자회사 관련 재무 부담은 하방 압력으로 작용할 위협이 있다 <a href="https://www.mk.co.kr/article/12157285" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://www.ebn.co.kr/news/articleView.html?idxno=1723446" target="_blank" rel="noopener noreferrer">[출처]</a>.</li>
+</ul>
+
+<p><strong>5년 시계열 전망</strong></p>
+<ul>
+  <li><strong>예상되는 주요 흐름/변화 요인:</strong> AI 및 HBM 반도체 수요 증가와 함께 관련 소부장 생태계 및 ETF 편입 등 투자자들의 관심이 이어질 수 있으나 <a href="https://www.sedaily.com/article/20090922?ref=naver" target="_blank" rel="noopener noreferrer">[출처]</a>, 구체적인 장기 실적 추이는 시장 환경 변화에 따라 유동적이다. 제공된 자료에 따르면 5년 뒤의 구체적인 산업 지표나 SFA반도체의 장기 실적 궤적에 대해서는 직접적으로 확인되지 않는다.</li>
+  <li><strong>회사에 미칠 영향:</strong> AI 및 HBM 반도체 시장 성장에 따른 수혜 기대감이 유효할 수 있으나 <a href="https://www.sedaily.com/article/20090922?ref=naver" target="_blank" rel="noopener noreferrer">[출처]</a>, 자회사 투자 성과나 자금 회수 여부 등에 따라 재무적 안정성이 좌우될 수 있다 <a href="https://www.ebn.co.kr/news/articleView.html?idxno=1723446" target="_blank" rel="noopener noreferrer">[출처]</a>. 시계열이 길어질수록 예측의 불확실성이 커진다.</li>
+</ul>
+
+<p><strong>10년 시계열 전망</strong></p>
+<ul>
+  <li><strong>예상되는 주요 흐름/변화 요인:</strong> 반도체 시장 규모가 장기적으로 크게 확대될 것이라는 전망이 존재하나 <a href="https://www.gukjenews.com/news/articleView.html?idxno=3701732" target="_blank" rel="noopener noreferrer">[출처]</a>, 10년이라는 장기 시계열 상의 구체적인 산업 변화 요인이나 SFA반도체의 사업 지속성에 관하여는 제공된 자료로 확인되지 않는다.</li>
+  <li><strong>회사에 미칠 영향:</strong> 장기적인 반도체 수요 확대 추세가 이어질 경우 기회 요인이 될 수 있으나 <a href="https://www.gukjenews.com/news/articleView.html?idxno=3701732" target="_blank" rel="noopener noreferrer">[출처]</a>, 거시경제 변동이나 기술 변화에 따른 위협 요인이 상존하며, 이 시계열에서의 영향은 불확실성이 매우 높다.</li>
+</ul>
+
+<p><strong>리스크 및 불확실성:</strong> 본 전망은 제공된 자료를 바탕으로 한 추정이며, 향후 시장 상황에 따라 실제 결과는 달라질 수 있다. 주요 리스크 요인으로는 SFA반도체의 단기 영업적자 지속 가능성, 필리핀 자회사의 순손실 및 추가 대여금에 따른 재무 부담 <a href="https://www.mk.co.kr/article/12157285" target="_blank" rel="noopener noreferrer">[출처]</a>, <a href="https://www.ebn.co.kr/news/articleView.html?idxno=1723446" target="_blank" rel="noopener noreferrer">[출처]</a>, 그리고 DDR5 테스트 설비 이관 및 가동률 상승 계획의 실행 지연 가능성이 있다 <a href="https://www.mk.co.kr/article/12157285" target="_blank" rel="noopener noreferrer">[출처]</a>. 특히 5년 및 10년과 같이 시계열이 길어질수록 산업 환경과 기업 실적을 둘러싼 불확실성은 더욱 확대된다.</p></div>
+  </section>
+
+  <section>
+    <h2>데이터 출처</h2>
+    <div class="card">
+      <p><strong>공식 재무데이터</strong></p>
+      <ul class="source-list">
+        <li>DART 전자공시 사업보고서(reprt_code=11011), corp_code=00301246</li>
+        <li>DART 전자공시 분기·반기·사업보고서, corp_code=00301246</li>
+      </ul>
+      
+      <p><strong>검색 기반 참고자료</strong></p>
+      <ul class="source-list">
+        
+        <li><a href="https://www.businesspost.co.kr/BP?command=article_view&amp;num=441907" target="_blank" rel="noopener noreferrer">[Who Is ?] 김상경 SFA 대표이사</a> · Wed, 15 Jul 2026 07:02:00 +0900</li>
+        
+        <li><a href="http://www.industrynews.co.kr/news/articleView.html?idxno=58692" target="_blank" rel="noopener noreferrer">SFA, BGF로지스로부터 500억 규모 물류시스템 수주</a> · Thu, 02 Jan 2025 15:02:00 +0900</li>
+        
+        <li><a href="https://www.thebell.co.kr/free/content/ArticleView.asp?key=202308271848102640105481" target="_blank" rel="noopener noreferrer">[더벨][SFA는 지금] 2차전지·반도체가 양날개, 밸류업은 계속된다</a> · Fri, 15 Sep 2023 10:38:00 +0900</li>
+        
+        <li><a href="http://www.finomy.com/news/articleView.html?idxno=251976" target="_blank" rel="noopener noreferrer">시스템반도체 관련주, &#39;싱글벙글&#39; 에이디테크놀로지·넥스트칩·파두·S...</a> · Tue, 24 Mar 2026 18:16:00 +0900</li>
+        
+        <li><a href="https://www.pinpointnews.co.kr/news/articleView.html?idxno=488972" target="_blank" rel="noopener noreferrer">OSAT 수요 급증에 웃는 시그네틱스...글로벌 반도체 훈풍 타고 도약</a> · Mon, 21 Sep 2026 09:56:00 +0900</li>
+        
+        <li><a href="http://www.joseilbo.com/news/news_read.php?uid=575610&amp;class=17&amp;grp=" target="_blank" rel="noopener noreferrer">美 반도체주는 올랐는데…삼성 3%·하닉 6% 급락, 이유는? [칩칩폭폭]</a> · Mon, 14 Sep 2026 10:08:00 +0900</li>
+        
+        <li><a href="https://www.edaily.co.kr/News/Read?newsId=02601046645575856&amp;mediaCodeNo=257&amp;utm_source=naver&amp;utm_medium=referral&amp;utm_campaign=news_syndication&amp;utm_content=original_article" target="_blank" rel="noopener noreferrer">SFA반도체, 삼성전자 DDR5 외주화 수혜…턴어라운드 기대-SK</a> · Tue, 01 Sep 2026 07:58:00 +0900</li>
+        
+        <li><a href="https://www.pinpointnews.co.kr/news/articleView.html?idxno=487248" target="_blank" rel="noopener noreferrer">2차전지 장비주, 케이엔에스·SFA 급등 속 업종 &#39;기지개&#39;</a> · Tue, 15 Sep 2026 14:56:00 +0900</li>
+        
+        <li><a href="http://www.thebigdata.co.kr/view.php?ud=202609030748444838d0a8833aad_23" target="_blank" rel="noopener noreferrer">삼성전자, 반도체 상장기업 브랜드평판 2026년 9월 빅데이터 1위... SK하...</a> · Thu, 03 Sep 2026 08:38:00 +0900</li>
+        
+        <li><a href="https://www.pinpointnews.co.kr/news/articleView.html?idxno=388471" target="_blank" rel="noopener noreferrer">SFA반도체, 범핑·패키징 기술로 글로벌 반도체 시장 선도... 외국인 폭...</a> · Sun, 26 Oct 2025 14:10:00 +0900</li>
+        
+        <li><a href="http://www.thebigdata.co.kr/view.php?ud=202608050758415699d0a8833aad_23" target="_blank" rel="noopener noreferrer">삼성전자, 반도체 상장기업 브랜드평판 8월 빅데이터 1위...SK하이닉스 ...</a> · Wed, 05 Aug 2026 08:50:00 +0900</li>
+        
+        <li><a href="https://www.sedaily.com/article/20090922?ref=naver" target="_blank" rel="noopener noreferrer">한화운용, HBM·AI 반도체 소부장 ETF 2종 상장</a> · Tue, 15 Sep 2026 09:05:00 +0900</li>
+        
+        <li><a href="https://view.asiae.co.kr/article/2026091508535242949" target="_blank" rel="noopener noreferrer">&#39;PLUS 코리아HBM반도체&#39;·&#39;PLUS AI반도체소부장액티브&#39; 신규 상장</a> · Tue, 15 Sep 2026 08:53:00 +0900</li>
+        
+        <li><a href="https://www.hankyung.com/article/2026091556006" target="_blank" rel="noopener noreferrer">&#34;앤트로픽 상장도 노린다&#34;…AI·반도체 ETF 4종 나란히 출격</a> · Tue, 15 Sep 2026 12:57:00 +0900</li>
+        
+        <li><a href="https://www.newspim.com/news/view/20260915000251" target="_blank" rel="noopener noreferrer">한화운용, &#39;코리아HBM반도체&#39;·&#39;AI반도체소부장액티브&#39; ETF 상장</a> · Tue, 15 Sep 2026 09:25:00 +0900</li>
+        
+        <li><a href="https://www.mk.co.kr/article/12157285" target="_blank" rel="noopener noreferrer">“삼성전자 DDR5 외주물량 싹쓸이?”…나흘새 23% 뛴 SFA반도체 [이주의...</a> · Sun, 20 Sep 2026 08:58:00 +0900</li>
+        
+        <li><a href="https://www.newspim.com/news/view/20260921000886" target="_blank" rel="noopener noreferrer">&#39;10조 던진&#39; 외국인, 반도체 다시 담는다…견조한 업황에 강세</a> · Mon, 21 Sep 2026 15:26:00 +0900</li>
+        
+        <li><a href="https://www.pinpointnews.co.kr/news/articleView.html?idxno=488107" target="_blank" rel="noopener noreferrer">[코스닥 기관] 하나마이크론·RFHIC 폭풍매수...알테오젠·SFA반도체 차익...</a> · Thu, 17 Sep 2026 15:58:00 +0900</li>
+        
+        <li><a href="https://www.ebn.co.kr/news/articleView.html?idxno=1723446" target="_blank" rel="noopener noreferrer">SFA반도체, 적자 필리핀 자회사에 1007억 추가 대여</a> · Tue, 08 Sep 2026 15:36:00 +0900</li>
+        
+        <li><a href="https://www.news1.kr/finance/general-stock/6299443" target="_blank" rel="noopener noreferrer">한국거래소, 내달 6~7일 &#39;코스닥 데이&#39;…정책·산업 전망·기업 IR</a> · Tue, 22 Sep 2026 17:58:00 +0900</li>
+        
+      </ul>
+      
+    </div>
+  </section>
+
+  <footer>
+    Generated by 종목분석 Agent · 2026-09-22 09:12
+  </footer>
+</div>
+
+<script>
+  (function () {
+    var saved = localStorage.getItem('stockagent-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  })();
+  function toggleTheme() {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('stockagent-theme', next);
+  }
+</script>
+</body>
+</html>

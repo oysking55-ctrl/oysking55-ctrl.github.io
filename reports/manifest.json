@@ -1,5 +1,12 @@
 [
   {
+    "ticker": "036540",
+    "name": "SFA반도체",
+    "market": "KR",
+    "date": "2026-09-22",
+    "filename": "036540_2026-09-22.html"
+  },
+  {
     "ticker": "402340",
     "name": "SK스퀘어",
     "market": "KR",
